@@ -6,10 +6,22 @@ import {
   getDatasetSummary,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { readLimiter } from "@/lib/rate-limit";
+import { applyRateLimit } from "@/lib/api-utils";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+const CACHE_TTL_MS = 60_000; // 60 seconds
+let cachedResponse: { data: unknown; expiresAt: number } | null = null;
+
+export async function GET(req: Request) {
+  const blocked = applyRateLimit(req, readLimiter);
+  if (blocked) return blocked;
+
+  if (cachedResponse && Date.now() < cachedResponse.expiresAt) {
+    return NextResponse.json(cachedResponse.data);
+  }
+
   const [total, pressureCounts, avgChange, summary] = await Promise.all([
     getSubmissionCount(),
     getPressureCounts(),
@@ -26,10 +38,8 @@ export async function GET() {
     }))
     .sort((a, b) => b.count - a.count);
 
-  return NextResponse.json({
-    total,
-    avgChange,
-    pressures,
-    summary,
-  });
+  const data = { total, avgChange, pressures, summary };
+  cachedResponse = { data, expiresAt: Date.now() + CACHE_TTL_MS };
+
+  return NextResponse.json(data);
 }

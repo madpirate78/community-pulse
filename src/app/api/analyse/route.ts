@@ -12,10 +12,14 @@ import {
   getRecentSubmissionCounts,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { aiLimiter } from "@/lib/rate-limit";
+import { applyRateLimit } from "@/lib/api-utils";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(req: Request) {
+  const blocked = applyRateLimit(req, aiLimiter);
+  if (blocked) return blocked;
   const start = Date.now();
 
   try {
