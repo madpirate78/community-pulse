@@ -12,6 +12,13 @@ import { PRESSURE_LABELS } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+const MAX_RETRIES = 3;
+const RETRY_DELAYS = [5_000, 15_000, 30_000];
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function POST() {
   try {
     const [summary, sacrifices, adaptiveData, pressureCounts, recent] =
@@ -46,39 +53,63 @@ export async function POST() {
       recent.thisMonth
     );
 
-    const response = await getAI().models.generateContentStream({
-      model: MODELS.flash,
-      contents: [
-        { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
-      ],
-      config: {
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.LOW,
-        },
-      },
-    });
+    // Retry with backoff for overloaded model (503) and rate limits (429)
+    let lastError: unknown;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await getAI().models.generateContentStream({
+          model: MODELS.flash,
+          contents: [
+            { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
+          ],
+          config: {
+            thinkingConfig: {
+              thinkingLevel: ThinkingLevel.LOW,
+            },
+          },
+        });
 
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of response) {
-            const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) {
-              controller.enqueue(encoder.encode(text));
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          async start(controller) {
+            try {
+              for await (const chunk of response) {
+                const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) {
+                  controller.enqueue(encoder.encode(text));
+                }
+              }
+            } finally {
+              controller.close();
             }
-          }
-        } finally {
-          controller.close();
-        }
-      },
-    });
+          },
+        });
 
-    return new Response(stream, {
-      headers: { "Content-Type": "text/plain; charset=utf-8" },
-    });
+        return new Response(stream, {
+          headers: { "Content-Type": "text/plain; charset=utf-8" },
+        });
+      } catch (error: unknown) {
+        lastError = error;
+        const status = (error as { status?: number }).status;
+        if ((status === 503 || status === 429) && attempt < MAX_RETRIES) {
+          const delay = RETRY_DELAYS[attempt];
+          console.log(`Model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+          await sleep(delay);
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    throw lastError;
   } catch (error) {
     console.error("Insight generation error:", error);
+    const status = (error as { status?: number }).status;
+    if (status === 503 || status === 429) {
+      return new Response("Model is busy — please try again in a minute.", {
+        status: 503,
+      });
+    }
     return new Response("Failed to generate insight", { status: 500 });
   }
 }
