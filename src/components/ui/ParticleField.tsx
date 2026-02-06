@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 
 interface Particle {
   x: number;
@@ -38,6 +38,9 @@ export function ParticleField() {
   const mouseRef = useRef({ x: -1000, y: -1000 });
   const particlesRef = useRef<Particle[]>([]);
   const rafRef = useRef<number>(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const initParticles = useCallback((width: number, height: number) => {
     const particles: Particle[] = [];
@@ -165,9 +168,7 @@ export function ParticleField() {
     };
   }, [initParticles]);
 
-  if (typeof window !== "undefined" && prefersReducedMotion()) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
     <canvas
