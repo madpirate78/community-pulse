@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { PressureChart } from "./PressureChart";
 import { StatsBar } from "./StatsBar";
 
@@ -36,15 +37,15 @@ export function StatsDashboard() {
   if (loading) {
     return (
       <div className="animate-pulse space-y-4">
-        <div className="h-10 rounded-xl bg-gray-200 dark:bg-gray-800" />
-        <div className="h-72 rounded-xl bg-gray-200 dark:bg-gray-800" />
+        <div className="h-10 rounded-xl bg-border" />
+        <div className="h-72 rounded-xl bg-border" />
       </div>
     );
   }
 
   if (!data || data.total === 0) {
     return (
-      <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-700">
+      <div className="rounded-xl border-2 border-dashed border-accent/30 p-8 text-center text-muted">
         <p className="text-lg font-medium">No submissions yet</p>
         <p className="mt-1 text-sm">
           Be the first to add your voice.
@@ -54,7 +55,12 @@ export function StatsDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      className="space-y-6"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
       <StatsBar
         total={data.total}
         topPressure={data.summary.top_pressure}
@@ -63,7 +69,7 @@ export function StatsDashboard() {
       />
 
       <div>
-        <h3 className="mb-3 text-lg font-semibold">
+        <h3 className="mb-3 font-display text-lg font-semibold">
           Biggest Pressures
         </h3>
         <PressureChart data={data.pressures} />
@@ -71,14 +77,14 @@ export function StatsDashboard() {
 
       {data.summary.sacrifice_themes.length > 0 && (
         <div>
-          <h3 className="mb-3 text-lg font-semibold">
+          <h3 className="mb-3 font-display text-lg font-semibold">
             What People Are Giving Up
           </h3>
           <div className="flex flex-wrap gap-2">
             {data.summary.sacrifice_themes.map((theme) => (
               <span
                 key={theme}
-                className="rounded-full bg-gray-200 px-3 py-1 text-sm capitalize dark:bg-gray-700"
+                className="rounded-full border border-border bg-surface px-3 py-1 text-sm capitalize transition-colors hover:border-accent hover:bg-accent-subtle"
               >
                 {theme}
               </span>
@@ -86,6 +92,6 @@ export function StatsDashboard() {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

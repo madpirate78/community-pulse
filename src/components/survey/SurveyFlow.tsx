@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import type { FixedAnswers, AdaptiveQuestions } from "@/lib/types";
 import { FixedQuestionsForm } from "./FixedQuestionsForm";
 import { ShimmerLoader } from "./ShimmerLoader";
@@ -9,6 +10,13 @@ import { AdaptiveForm } from "./AdaptiveForm";
 import { submitResponse } from "@/app/submit/actions";
 
 type Stage = "fixed" | "loading" | "adaptive" | "submitting" | "done";
+
+const stageMotion = {
+  initial: { opacity: 0, x: 24 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: -24 },
+  transition: { duration: 0.3, ease: "easeInOut" as const },
+};
 
 export function SurveyFlow() {
   const router = useRouter();
@@ -66,24 +74,32 @@ export function SurveyFlow() {
     }
   }
 
-  if (stage === "loading" || stage === "submitting") {
-    return <ShimmerLoader />;
-  }
-
-  if (stage === "adaptive" && adaptiveQuestions) {
-    return (
-      <AdaptiveForm
-        questions={adaptiveQuestions}
-        onSubmit={handleAdaptiveSubmit}
-        isSubmitting={isSubmitting}
-      />
-    );
-  }
-
   return (
-    <FixedQuestionsForm
-      onSubmit={handleFixedSubmit}
-      isSubmitting={isSubmitting}
-    />
+    <AnimatePresence mode="wait">
+      {(stage === "loading" || stage === "submitting") && (
+        <motion.div key="loader" {...stageMotion}>
+          <ShimmerLoader />
+        </motion.div>
+      )}
+
+      {stage === "adaptive" && adaptiveQuestions && (
+        <motion.div key="adaptive" {...stageMotion}>
+          <AdaptiveForm
+            questions={adaptiveQuestions}
+            onSubmit={handleAdaptiveSubmit}
+            isSubmitting={isSubmitting}
+          />
+        </motion.div>
+      )}
+
+      {stage === "fixed" && (
+        <motion.div key="fixed" {...stageMotion}>
+          <FixedQuestionsForm
+            onSubmit={handleFixedSubmit}
+            isSubmitting={isSubmitting}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

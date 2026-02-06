@@ -92,16 +92,16 @@ export function StreamingInsight({ cachedInsight }: StreamingInsightProps) {
   return (
     <div className="space-y-4">
       {text ? (
-        <div className="prose prose-gray max-w-none dark:prose-invert">
+        <div className="max-w-none space-y-3 leading-relaxed text-foreground">
           {text.split("\n").map((line, i) => (
             <p key={i}>{line}</p>
           ))}
           {isStreaming && (
-            <span className="inline-block h-4 w-1 animate-pulse bg-blue-500" />
+            <span className="inline-block h-4 w-1 animate-cursor-pulse bg-accent" />
           )}
         </div>
       ) : !isStreaming ? (
-        <div className="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center text-gray-500 dark:border-gray-700">
+        <div className="rounded-xl border-2 border-dashed border-accent/30 p-8 text-center text-muted">
           <p className="text-lg font-medium">No insight generated yet</p>
           <p className="mt-1 text-sm">
             Generate an AI-powered community narrative from the data.
@@ -109,15 +109,15 @@ export function StreamingInsight({ cachedInsight }: StreamingInsightProps) {
         </div>
       ) : (
         <div className="space-y-3 py-8">
-          <div className="h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-          <div className="h-4 w-5/6 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-          <div className="h-4 w-4/6 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
+          <div className="h-4 animate-pulse rounded bg-border" />
+          <div className="h-4 w-5/6 animate-pulse rounded bg-border" />
+          <div className="h-4 w-4/6 animate-pulse rounded bg-border" />
         </div>
       )}
 
       {status && (
-        <p className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+        <p className="flex items-center gap-2 text-sm text-muted">
+          <svg className="h-4 w-4 animate-spin text-accent" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -126,14 +126,14 @@ export function StreamingInsight({ cachedInsight }: StreamingInsightProps) {
       )}
 
       {error && (
-        <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>
+        <p className="text-sm text-amber-600">{error}</p>
       )}
 
       <div className="flex gap-3">
         <button
           onClick={generate}
           disabled={isStreaming}
-          className="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-50 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+          className="rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
         >
           {isStreaming
             ? "Generating..."
@@ -144,7 +144,7 @@ export function StreamingInsight({ cachedInsight }: StreamingInsightProps) {
         {isStreaming && (
           <button
             onClick={handleCancel}
-            className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-600 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-900"
+            className="rounded-lg border border-border px-4 py-2.5 text-sm text-muted transition-colors hover:border-border-strong hover:text-foreground"
           >
             Cancel
           </button>

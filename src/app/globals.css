@@ -2,19 +2,133 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Neo-Parchment Design System ── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #F7F4EE;
+  --bg-surface: #FFFFFF;
+  --text: #1C1917;
+  --text-muted: #57534E;
+  --accent: #B45309;
+  --accent-hover: #92400E;
+  --accent-subtle: #FEF3C7;
+  --accent-glow: rgba(180, 83, 9, 0.12);
+  --border: #E7E5E4;
+  --border-strong: #D6D3D1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #0C0A09;
+    --bg-surface: #1C1917;
+    --text: #F5F5F4;
+    --text-muted: #BAB5B0;
+    --accent: #F59E0B;
+    --accent-hover: #FBBF24;
+    --accent-subtle: rgba(245, 158, 11, 0.1);
+    --accent-glow: rgba(245, 158, 11, 0.15);
+    --border: #292524;
+    --border-strong: #44403C;
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ── Typography ── */
+
+h1, h2, h3 {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+}
+
+/* ── Grain Overlay ── */
+
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.grain-overlay svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay {
+    opacity: 0.15;
+  }
+}
+
+/* ── Utility Classes ── */
+
+.glass-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow:
+    0 1px 3px rgba(28, 25, 23, 0.04),
+    0 4px 12px rgba(28, 25, 23, 0.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-card {
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.accent-glow {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.section-rule {
+  height: 2px;
+  background: linear-gradient(to right, var(--accent), transparent);
+  border: none;
+}
+
+/* ── Animations ── */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px var(--accent-glow); }
+  50% { box-shadow: 0 0 24px var(--accent-glow); }
+}
+
+@keyframes cursor-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── Scrollbar ── */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
 }

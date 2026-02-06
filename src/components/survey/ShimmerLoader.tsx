@@ -1,11 +1,18 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 export function ShimmerLoader() {
   return (
-    <div className="space-y-4 py-8 text-center">
-      <div className="inline-flex items-center gap-2 text-lg font-medium text-gray-600 dark:text-gray-400">
+    <motion.div
+      className="space-y-4 py-8 text-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="inline-flex items-center gap-2 text-lg font-medium text-muted">
         <svg
-          className="h-5 w-5 animate-spin"
+          className="h-5 w-5 animate-spin text-accent"
           viewBox="0 0 24 24"
           fill="none"
         >
@@ -26,10 +33,10 @@ export function ShimmerLoader() {
         Thinking about what to ask you next...
       </div>
       <div className="mx-auto max-w-md space-y-3">
-        <div className="h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-        <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-800" />
-        <div className="h-10 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-800" />
+        <div className="h-4 animate-pulse rounded bg-border" />
+        <div className="h-4 w-3/4 animate-pulse rounded bg-border" />
+        <div className="h-10 animate-pulse rounded-lg bg-border" />
       </div>
-    </div>
+    </motion.div>
   );
 }

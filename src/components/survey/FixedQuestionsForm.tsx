@@ -45,27 +45,27 @@ export function FixedQuestionsForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       <div>
-        <label className="mb-3 block text-lg font-semibold">
+        <label className="mb-3 block font-display text-lg font-semibold">
           What&apos;s your biggest financial pressure right now?
         </label>
         <EmojiSelector value={pressure} onChange={setPressure} />
         {errors.pressure && (
-          <p className="mt-2 text-sm text-red-600">{errors.pressure}</p>
+          <p className="mt-2 text-sm text-red-700/80">{errors.pressure}</p>
         )}
       </div>
 
       <div>
-        <label className="mb-3 block text-lg font-semibold">
+        <label className="mb-3 block font-display text-lg font-semibold">
           Compared to a year ago, how are things?
         </label>
         <ScaleSelector value={change} onChange={setChange} />
         {errors.change && (
-          <p className="mt-2 text-sm text-red-600">{errors.change}</p>
+          <p className="mt-2 text-sm text-red-700/80">{errors.change}</p>
         )}
       </div>
 
       <div>
-        <label className="mb-3 block text-lg font-semibold">
+        <label className="mb-3 block font-display text-lg font-semibold">
           What&apos;s the one thing you&apos;ve had to cut back on or give up?
         </label>
         <textarea
@@ -74,11 +74,11 @@ export function FixedQuestionsForm({
           placeholder='e.g. "Heating", "Seeing friends", "Fresh fruit"'
           maxLength={200}
           rows={2}
-          className="w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm transition-colors focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:focus:border-blue-400"
+          className="w-full rounded-lg border-2 border-border bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
         />
-        <div className="mt-1 flex justify-between text-xs text-gray-500">
+        <div className="mt-1 flex justify-between text-xs text-muted">
           {errors.sacrifice ? (
-            <span className="text-red-600">{errors.sacrifice}</span>
+            <span className="text-red-700/80">{errors.sacrifice}</span>
           ) : (
             <span />
           )}
@@ -89,7 +89,7 @@ export function FixedQuestionsForm({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-blue-600 px-6 py-4 text-lg font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
       >
         {isSubmitting ? "Submitting..." : "Continue"}
       </button>
