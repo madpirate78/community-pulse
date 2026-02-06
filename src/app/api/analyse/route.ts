@@ -1,4 +1,3 @@
-import { ThinkingLevel } from "@google/genai";
 import { NextResponse } from "next/server";
 import { getAI, MODELS } from "@/lib/gemini";
 import { db } from "@/db";
@@ -59,15 +58,10 @@ export async function POST(req: Request) {
     );
 
     const response = await getAI().models.generateContent({
-      model: MODELS.flash,
+      model: MODELS.thinking,
       contents: [
         { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
       ],
-      config: {
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.LOW,
-        },
-      },
     });
 
     const insightText = response.text ?? "";
@@ -77,7 +71,7 @@ export async function POST(req: Request) {
       insightText,
       dataSummary: summary as unknown as Record<string, unknown>,
       submissionCount: summary.total_responses,
-      modelUsed: MODELS.flash,
+      modelUsed: MODELS.thinking,
       generationTimeMs: elapsed,
     });
 
