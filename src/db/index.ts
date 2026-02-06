@@ -3,7 +3,8 @@ import Database from "better-sqlite3";
 import * as schema from "./schema";
 
 function createDb() {
-  const sqlite = new Database("community-pulse.db");
+  const dbPath = process.env.DB_PATH || "community-pulse.db";
+  const sqlite = new Database(dbPath);
   sqlite.pragma("journal_mode = WAL");
 
   // Auto-create tables if they don't exist
