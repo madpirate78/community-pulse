@@ -59,7 +59,7 @@ export async function POST(req: Request) {
     );
 
     const response = await getAI().models.generateContent({
-      model: MODELS.flash,
+      model: MODELS.thinking,
       contents: [
         { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
       ],
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
       insightText,
       dataSummary: summary as unknown as Record<string, unknown>,
       submissionCount: summary.total_responses,
-      modelUsed: MODELS.flash,
+      modelUsed: MODELS.thinking,
       generationTimeMs: elapsed,
     });
 

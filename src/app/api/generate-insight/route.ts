@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         const response = await getAI().models.generateContentStream({
-          model: MODELS.flash,
+          model: MODELS.thinking,
           contents: [
             { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
           ],

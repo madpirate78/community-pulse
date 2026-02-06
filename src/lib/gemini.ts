@@ -15,5 +15,5 @@ export function getAI(): GoogleGenAI {
 
 export const MODELS = {
   flash: "gemini-3-flash-preview",
-  pro: "gemini-3-pro-preview",
+  thinking: "gemini-2.5-flash",
 } as const;
