@@ -60,13 +60,13 @@ export interface DatasetSummary {
 // ─── UI Labels ────────────────────────────────────────────────
 
 export const PRESSURE_LABELS: Record<string, string> = {
-  housing: "\u{1F3E0} Housing costs",
-  food: "\u{1F6D2} Food & groceries",
-  energy: "\u26A1 Energy bills",
-  transport: "\u{1F697} Getting around",
-  childcare: "\u{1F476} Childcare",
-  healthcare: "\u{1F3E5} Healthcare",
-  debt: "\u{1F4B3} Debt & borrowing",
+  housing: "Housing costs",
+  food: "Food & groceries",
+  energy: "Energy bills",
+  transport: "Getting around",
+  childcare: "Childcare",
+  healthcare: "Healthcare",
+  debt: "Debt & borrowing",
   other: "Other",
 };
 

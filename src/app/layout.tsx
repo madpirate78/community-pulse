@@ -1,17 +1,26 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
+import { GrainOverlay } from "@/components/ui/GrainOverlay";
 import "./globals.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+  axes: ["opsz"],
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -37,35 +46,36 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
-        <nav className="border-b border-gray-200 dark:border-gray-800">
+        <nav className="sticky top-0 z-40 border-b border-border bg-parchment/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-lg font-bold">
+            <Link href="/" className="font-display text-lg font-bold tracking-tight text-accent">
               Community Pulse
             </Link>
-            <div className="flex gap-4 text-sm">
+            <div className="flex gap-5 text-sm font-medium">
               <Link
                 href="/submit"
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="relative text-muted transition-colors hover:text-foreground"
               >
                 Submit
               </Link>
               <Link
                 href="/statistics"
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="relative text-muted transition-colors hover:text-foreground"
               >
                 Statistics
               </Link>
               <Link
                 href="/insights"
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+                className="relative text-muted transition-colors hover:text-foreground"
               >
                 Insights
               </Link>
             </div>
           </div>
         </nav>
+        <GrainOverlay />
         {children}
       </body>
     </html>

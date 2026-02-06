@@ -18,14 +18,14 @@ interface PressureData {
 }
 
 const COLORS = [
-  "#3b82f6",
-  "#8b5cf6",
-  "#ec4899",
-  "#f97316",
-  "#eab308",
-  "#22c55e",
-  "#06b6d4",
-  "#6b7280",
+  "#B45309",  // amber
+  "#9A3412",  // terracotta
+  "#65A30D",  // sage
+  "#0D9488",  // teal
+  "#7C3AED",  // violet
+  "#B91C1C",  // clay red
+  "#CA8A04",  // gold
+  "#6B7280",  // stone gray
 ];
 
 export function PressureChart({ data }: { data: PressureData[] }) {
@@ -44,10 +44,16 @@ export function PressureChart({ data }: { data: PressureData[] }) {
             type="category"
             dataKey="label"
             width={160}
-            tick={{ fontSize: 13 }}
+            tick={{ fontSize: 13, fill: "var(--text-muted)" }}
           />
           <Tooltip
             formatter={(value) => [`${value} responses`, "Count"]}
+            contentStyle={{
+              background: "var(--bg-surface)",
+              border: "1px solid var(--border)",
+              borderRadius: "8px",
+              color: "var(--text)",
+            }}
           />
           <Bar dataKey="count" radius={[0, 6, 6, 0]}>
             {data.map((_, i) => (

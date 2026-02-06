@@ -19,8 +19,8 @@ export function EmojiSelector({ value, onChange }: EmojiSelectorProps) {
           onClick={() => onChange(key)}
           className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all ${
             value === key
-              ? "border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100"
-              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
+              ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+              : "border-border hover:border-border-strong"
           }`}
         >
           {label}

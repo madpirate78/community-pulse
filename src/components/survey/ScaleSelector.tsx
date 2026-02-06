@@ -17,8 +17,8 @@ export function ScaleSelector({ value, onChange }: ScaleSelectorProps) {
           onClick={() => onChange(n)}
           className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-xs font-medium transition-all sm:text-sm ${
             value === n
-              ? "border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-950 dark:text-blue-100"
-              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
+              ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+              : "border-border hover:border-border-strong"
           }`}
         >
           {CHANGE_LABELS[n]}
