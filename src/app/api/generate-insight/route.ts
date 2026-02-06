@@ -47,15 +47,14 @@ export async function POST() {
     );
 
     const response = await getAI().models.generateContentStream({
-      model: MODELS.pro,
+      model: MODELS.flash,
       contents: [
         { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
       ],
       config: {
         thinkingConfig: {
-          thinkingLevel: ThinkingLevel.HIGH,
+          thinkingLevel: ThinkingLevel.LOW,
         },
-        tools: [{ googleSearch: {} }],
       },
     });
 

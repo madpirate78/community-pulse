@@ -55,15 +55,14 @@ export async function POST() {
     );
 
     const response = await getAI().models.generateContent({
-      model: MODELS.pro,
+      model: MODELS.flash,
       contents: [
         { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
       ],
       config: {
         thinkingConfig: {
-          thinkingLevel: ThinkingLevel.HIGH,
+          thinkingLevel: ThinkingLevel.LOW,
         },
-        tools: [{ googleSearch: {} }],
       },
     });
 
@@ -74,7 +73,7 @@ export async function POST() {
       insightText,
       dataSummary: summary as unknown as Record<string, unknown>,
       submissionCount: summary.total_responses,
-      modelUsed: MODELS.pro,
+      modelUsed: MODELS.flash,
       generationTimeMs: elapsed,
     });
 
