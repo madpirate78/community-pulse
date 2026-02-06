@@ -46,6 +46,20 @@ export const adaptiveQuestionSchema = z.object({
 
 export type AdaptiveQuestions = z.infer<typeof adaptiveQuestionSchema>;
 
+// ─── Adaptive Responses (submitted answers to follow-ups) ────
+
+export const adaptiveResponseSchema = z
+  .array(
+    z.object({
+      question: z.string().max(500),
+      input_type: z.enum(["single_choice", "scale", "short_text"]),
+      answer: z.union([z.string().max(200), z.number(), z.null()]),
+    })
+  )
+  .max(2);
+
+export type AdaptiveResponse = z.infer<typeof adaptiveResponseSchema>;
+
 // ─── Dataset Summary (fed into AI prompts) ────────────────────
 
 export interface DatasetSummary {

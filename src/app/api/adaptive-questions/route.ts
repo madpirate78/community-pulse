@@ -6,8 +6,12 @@ import { fixedQuestionsSchema, adaptiveQuestionSchema } from "@/lib/types";
 import { buildAdaptiveQuestionPrompt } from "@/lib/prompts";
 import { getDatasetSummary } from "@/lib/db-queries";
 import type { AdaptiveQuestions } from "@/lib/types";
+import { aiLimiter } from "@/lib/rate-limit";
+import { applyRateLimit } from "@/lib/api-utils";
 
 export async function POST(req: Request) {
+  const blocked = applyRateLimit(req, aiLimiter);
+  if (blocked) return blocked;
   try {
     const body = await req.json();
     const parsed = fixedQuestionsSchema.safeParse(body);

@@ -12,31 +12,35 @@ export async function getSubmissionCount(): Promise<number> {
   return row?.total ?? 0;
 }
 
-export async function getAllSubmissions() {
+export async function getAllSubmissions(limit = 100, offset = 0) {
   return db
     .select()
     .from(submissions)
     .where(eq(submissions.consentGiven, true))
-    .orderBy(desc(submissions.createdAt));
+    .orderBy(desc(submissions.createdAt))
+    .limit(limit)
+    .offset(offset);
 }
 
 export async function getPressureCounts(): Promise<
   Record<PressureOption, number>
 > {
-  const allSubs = await db
-    .select({ responses: submissions.responses })
+  const rows = await db
+    .select({
+      pressure: sql<string>`json_extract(${submissions.responses}, '$.biggest_pressure')`,
+      total: count(),
+    })
     .from(submissions)
-    .where(eq(submissions.consentGiven, true));
+    .where(eq(submissions.consentGiven, true))
+    .groupBy(sql`json_extract(${submissions.responses}, '$.biggest_pressure')`);
 
   const counts = Object.fromEntries(
     PRESSURE_OPTIONS.map((p) => [p, 0])
   ) as Record<PressureOption, number>;
 
-  for (const sub of allSubs) {
-    const pressure = (sub.responses as { biggest_pressure?: string })
-      ?.biggest_pressure;
-    if (pressure && pressure in counts) {
-      counts[pressure as PressureOption]++;
+  for (const row of rows) {
+    if (row.pressure && row.pressure in counts) {
+      counts[row.pressure as PressureOption] = row.total;
     }
   }
 
@@ -44,20 +48,14 @@ export async function getPressureCounts(): Promise<
 }
 
 export async function getAverageChangeDirection(): Promise<number> {
-  const allSubs = await db
-    .select({ responses: submissions.responses })
+  const [row] = await db
+    .select({
+      avg: sql<number>`ROUND(AVG(json_extract(${submissions.responses}, '$.change_direction')), 1)`,
+    })
     .from(submissions)
     .where(eq(submissions.consentGiven, true));
 
-  if (allSubs.length === 0) return 0;
-
-  const sum = allSubs.reduce((acc, sub) => {
-    const change = (sub.responses as { change_direction?: number })
-      ?.change_direction;
-    return acc + (change ?? 0);
-  }, 0);
-
-  return Math.round((sum / allSubs.length) * 10) / 10;
+  return row?.avg ?? 0;
 }
 
 export async function getAllSacrifices(): Promise<string[]> {

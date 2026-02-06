@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
-import { fixedQuestionsSchema } from "@/lib/types";
+import { fixedQuestionsSchema, adaptiveResponseSchema } from "@/lib/types";
 
 export async function submitResponse(
   fixedAnswers: unknown,
@@ -13,9 +13,18 @@ export async function submitResponse(
     return { success: false as const, error: parsed.error.flatten().fieldErrors };
   }
 
+  let validatedAdaptive: Record<string, unknown>[] | null = null;
+  if (adaptiveData != null) {
+    const adaptiveParsed = adaptiveResponseSchema.safeParse(adaptiveData);
+    if (!adaptiveParsed.success) {
+      return { success: false as const, error: { adaptive: ["Invalid adaptive data"] } };
+    }
+    validatedAdaptive = adaptiveParsed.data;
+  }
+
   await db.insert(submissions).values({
     responses: parsed.data,
-    adaptiveData: adaptiveData ?? null,
+    adaptiveData: validatedAdaptive,
     consentGiven: true,
   });
 

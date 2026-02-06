@@ -9,6 +9,8 @@ import {
   getRecentSubmissionCounts,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { aiLimiter } from "@/lib/rate-limit";
+import { applyRateLimit } from "@/lib/api-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,9 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function POST() {
+export async function POST(req: Request) {
+  const blocked = applyRateLimit(req, aiLimiter);
+  if (blocked) return blocked;
   try {
     const [summary, sacrifices, adaptiveData, pressureCounts, recent] =
       await Promise.all([
