@@ -85,15 +85,17 @@ export async function POST(req: Request) {
             } finally {
               controller.close();
               if (fullText) {
-                db.insert(insightSnapshots)
-                  .values({
+                try {
+                  await db.insert(insightSnapshots).values({
                     insightText: fullText,
                     dataSummary: summary as unknown as Record<string, unknown>,
                     submissionCount: summary.total_responses,
                     modelUsed: MODELS.thinking,
                     generationTimeMs: Date.now() - start,
-                  })
-                  .catch((err) => console.error("Failed to persist insight snapshot:", err));
+                  });
+                } catch (err) {
+                  console.error("Failed to persist insight snapshot:", err);
+                }
               }
             }
           },
