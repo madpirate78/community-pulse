@@ -21,7 +21,7 @@ export function ChoiceSelector({ options, value, onChange }: ChoiceSelectorProps
           onClick={() => onChange(opt.value)}
           className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium transition-all ${
             value === opt.value
-              ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+              ? "border-accent bg-accent-subtle text-foreground shadow-soft"
               : "border-border hover:border-border-strong"
           }`}
         >

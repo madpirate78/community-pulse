@@ -39,7 +39,7 @@ export function HeroSection() {
       <motion.div variants={item}>
         <Link
           href="/submit"
-          className="mt-8 inline-block rounded-xl bg-accent px-8 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98]"
+          className="mt-8 inline-block rounded-xl bg-accent px-8 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98]"
         >
           {ctaText}
         </Link>

@@ -17,16 +17,26 @@ interface PressureData {
   pct: number;
 }
 
-const COLORS = [
-  "#B45309",  // amber
-  "#9A3412",  // terracotta
-  "#65A30D",  // sage
-  "#0D9488",  // teal
-  "#7C3AED",  // violet
-  "#B91C1C",  // clay red
-  "#CA8A04",  // gold
-  "#6B7280",  // stone gray
+// Match particle field category colors for visual consistency
+const CATEGORY_COLORS: Record<string, string> = {
+  housing:    "#E11D48",  // rose-600
+  food:       "#D97706",  // amber-600
+  energy:     "#EA580C",  // orange-600
+  transport:  "#0D9488",  // teal-600
+  childcare:  "#7C3AED",  // violet-600
+  healthcare: "#0891B2",  // cyan-600
+  debt:       "#DC2626",  // red-600
+  other:      "#78716C",  // stone-500
+};
+
+const FALLBACK_COLORS = [
+  "#E11D48", "#D97706", "#EA580C", "#0D9488",
+  "#7C3AED", "#0891B2", "#DC2626", "#78716C",
 ];
+
+function getBarColor(key: string, index: number): string {
+  return CATEGORY_COLORS[key] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+}
 
 export function PressureChart({ data }: { data: PressureData[] }) {
   if (data.length === 0) return null;
@@ -56,8 +66,8 @@ export function PressureChart({ data }: { data: PressureData[] }) {
             }}
           />
           <Bar dataKey="count" radius={[0, 6, 6, 0]}>
-            {data.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            {data.map((entry, i) => (
+              <Cell key={i} fill={getBarColor(entry.key, i)} />
             ))}
           </Bar>
         </BarChart>

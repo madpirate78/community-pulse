@@ -59,9 +59,17 @@ export function ShimmerLoader() {
         </AnimatePresence>
       </div>
       <div className="mx-auto max-w-md space-y-3">
-        <div className="h-4 animate-pulse rounded bg-border" />
-        <div className="h-4 w-3/4 animate-pulse rounded bg-border" />
-        <div className="h-10 animate-pulse rounded-lg bg-border" />
+        {[1, 0.75, null].map((w, i) => (
+          <div
+            key={i}
+            className={`relative overflow-hidden ${i === 2 ? "h-10 rounded-lg" : "h-4 rounded"} bg-border`}
+            style={w ? { width: `${w * 100}%` } : undefined}
+          >
+            <div
+              className="absolute inset-0 -translate-x-full animate-[shimmer-sweep_1.5s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-[var(--gradient-start)] to-transparent opacity-10"
+            />
+          </div>
+        ))}
       </div>
     </motion.div>
   );

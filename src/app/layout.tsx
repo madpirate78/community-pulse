@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Fraunces, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import Link from "next/link";
 import { config } from "@/config";
 import { GrainOverlay } from "@/components/ui/GrainOverlay";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const instrumentSerif = Instrument_Serif({
+  weight: "400",
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
-  axes: ["opsz"],
 });
 
-const dmSans = DM_Sans({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-body",
   display: "swap",
@@ -45,9 +45,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${fraunces.variable} ${dmSans.variable} ${jetbrainsMono.variable} font-body antialiased`}
+        className={`${instrumentSerif.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
-        <nav className="sticky top-0 z-40 border-b border-border bg-parchment/80 backdrop-blur-md">
+        <nav className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight text-accent">
               {config.branding.appName}
@@ -73,6 +73,7 @@ export default function RootLayout({
               </Link>
             </div>
           </div>
+          <div className="h-px bg-gradient-to-r from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] opacity-30" />
         </nav>
         <GrainOverlay />
         {children}

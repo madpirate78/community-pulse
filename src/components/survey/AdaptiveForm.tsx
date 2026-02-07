@@ -47,7 +47,7 @@ export function AdaptiveForm({
                   }
                   className={`w-full rounded-lg border-2 px-4 py-3 text-left text-sm transition-all ${
                     answers[i] === opt
-                      ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+                      ? "border-accent bg-accent-subtle text-foreground shadow-soft"
                       : "border-border hover:border-border-strong"
                   }`}
                 >
@@ -69,7 +69,7 @@ export function AdaptiveForm({
                     }
                     className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm transition-all ${
                       answers[i] === n
-                        ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+                        ? "border-accent bg-accent-subtle text-foreground shadow-soft"
                         : "border-border hover:border-border-strong"
                     }`}
                   >
@@ -101,7 +101,7 @@ export function AdaptiveForm({
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
+        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50"
       >
         Submit Your Voice
       </button>
