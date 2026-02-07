@@ -22,6 +22,14 @@ function createDb() {
       adaptive_data TEXT,
       consent_given INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS extracted_themes (
+      id TEXT PRIMARY KEY,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      themes TEXT NOT NULL,
+      submission_count INTEGER NOT NULL,
+      model_used TEXT NOT NULL,
+      generation_time_ms INTEGER
+    );
     CREATE TABLE IF NOT EXISTS insight_snapshots (
       id TEXT PRIMARY KEY,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),

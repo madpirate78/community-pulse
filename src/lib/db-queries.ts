@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { submissions, insightSnapshots } from "@/db/schema";
+import { submissions, insightSnapshots, extractedThemes } from "@/db/schema";
 import { count, desc, sql, eq, and } from "drizzle-orm";
-import type { DatasetSummary, PressureOption } from "./types";
+import type { DatasetSummary, ExtractedTheme, PressureOption } from "./types";
 import { PRESSURE_OPTIONS } from "./types";
 
 export async function getSubmissionCount(): Promise<number> {
@@ -86,9 +86,23 @@ export async function getAllAdaptiveData(): Promise<Record<string, unknown>[]> {
     .flat();
 }
 
+export async function getLatestThemeExtraction() {
+  const [latest] = await db
+    .select()
+    .from(extractedThemes)
+    .orderBy(desc(extractedThemes.createdAt))
+    .limit(1);
+  return latest ?? null;
+}
+
+export async function getLatestThemes(): Promise<ExtractedTheme[] | null> {
+  const latest = await getLatestThemeExtraction();
+  return latest?.themes ?? null;
+}
+
 export async function getDatasetSummary(): Promise<DatasetSummary> {
-  const [totalCount, pressureCounts, avgChange, sacrifices] = await Promise.all(
-    [getSubmissionCount(), getPressureCounts(), getAverageChangeDirection(), getAllSacrifices()]
+  const [totalCount, pressureCounts, avgChange, sacrifices, aiThemes] = await Promise.all(
+    [getSubmissionCount(), getPressureCounts(), getAverageChangeDirection(), getAllSacrifices(), getLatestThemes()]
   );
 
   // Find top pressure
@@ -118,6 +132,7 @@ export async function getDatasetSummary(): Promise<DatasetSummary> {
     avg_change: avgChange,
     sacrifice_themes: themes,
     emerging_gap: emergingGap,
+    ai_themes: aiThemes,
   };
 }
 

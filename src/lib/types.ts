@@ -60,6 +60,22 @@ export const adaptiveResponseSchema = z
 
 export type AdaptiveResponse = z.infer<typeof adaptiveResponseSchema>;
 
+// ─── AI-Extracted Themes ─────────────────────────────────────
+
+export const extractedThemeSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  frequency: z.number(),
+  representative_quotes: z.array(z.string()),
+});
+
+export const extractedThemesResponseSchema = z.object({
+  themes: z.array(extractedThemeSchema).min(1).max(12),
+});
+
+export type ExtractedTheme = z.infer<typeof extractedThemeSchema>;
+export type ExtractedThemesResponse = z.infer<typeof extractedThemesResponseSchema>;
+
 // ─── Dataset Summary (fed into AI prompts) ────────────────────
 
 export interface DatasetSummary {
@@ -69,6 +85,7 @@ export interface DatasetSummary {
   avg_change: number;
   sacrifice_themes: string[];
   emerging_gap: string | null;
+  ai_themes: ExtractedTheme[] | null;
 }
 
 // ─── UI Labels ────────────────────────────────────────────────

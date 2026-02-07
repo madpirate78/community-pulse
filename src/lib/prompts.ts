@@ -14,7 +14,13 @@ This person just answered:
 Current dataset overview (${datasetSummary.total_responses} responses so far):
 - Top pressure: ${datasetSummary.top_pressure} (${datasetSummary.top_pressure_pct}%)
 - Average change score: ${datasetSummary.avg_change}/5
-- Most common sacrifice themes: ${datasetSummary.sacrifice_themes.join(", ")}
+- Most common sacrifice themes: ${
+    datasetSummary.ai_themes
+      ? datasetSummary.ai_themes
+          .map((t) => `"${t.name}" (~${t.frequency} mentions): ${t.description}`)
+          .join("; ")
+      : datasetSummary.sacrifice_themes.join(", ")
+  }
 ${datasetSummary.emerging_gap ? `- DATA GAP: We have very few responses about ${datasetSummary.emerging_gap}` : ""}
 
 Generate 1-2 follow-up questions that:
@@ -75,7 +81,21 @@ ${pressuresRanked}
 
 DIRECTION OF CHANGE: Average score ${stats.avg_change}/5
 (1=much better, 5=much worse)
+${
+  stats.ai_themes
+    ? `
+COMMUNITY THEMES (AI-discovered patterns across all sacrifice responses):
+${stats.ai_themes
+  .map(
+    (t) =>
+      `- ${t.name} (~${t.frequency} mentions): ${t.description}\n  Quotes: ${t.representative_quotes.map((q) => `"${q}"`).join(", ")}`
+  )
+  .join("\n")}
 
+Use the COMMUNITY THEMES section to structure your narrative around the dominant patterns, but let the individual quotes bring them to life.
+`
+    : ""
+}
 WHAT PEOPLE HAVE SACRIFICED (their own words):
 ${allSacrifices.map((s) => `- "${s}"`).join("\n")}
 
