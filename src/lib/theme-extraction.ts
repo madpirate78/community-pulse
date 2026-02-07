@@ -2,35 +2,18 @@ import { getAI, MODELS } from "@/lib/gemini";
 import { getAllSacrifices, getSubmissionCount, getLatestThemeExtraction } from "@/lib/db-queries";
 import { extractedThemesResponseSchema } from "@/lib/types";
 import type { ExtractedTheme } from "@/lib/types";
+import { config } from "@/config";
+import { renderPrompt } from "@/lib/prompt-renderer";
 import { db } from "@/db";
 import { extractedThemes } from "@/db/schema";
-
-const EXTRACTION_INTERVAL = 5;
 
 let extractionInProgress = false;
 
 function buildThemeExtractionPrompt(sacrifices: string[]): string {
-  return `You are analysing anonymous free-text responses to the question:
-"What have you had to cut back on or give up because of rising costs?"
-
-Here are all ${sacrifices.length} responses:
-${sacrifices.map((s, i) => `${i + 1}. "${s}"`).join("\n")}
-
-Discover the dominant themes that emerge from these responses. Do NOT use predefined categories — let the patterns emerge from the actual language people use.
-
-For each theme:
-- Give it a short, plain-language name (2-4 words)
-- Write a one-sentence description of what this theme captures
-- Count how many responses relate to this theme (a response can belong to multiple themes)
-- Include 1-3 verbatim quotes that best represent this theme
-
-Rules:
-- Return between 1 and 12 themes, ranked by frequency (most common first)
-- Only create a theme if at least 2 responses relate to it
-- Use the respondents' own language where possible
-- Do not invent or embellish quotes — use exact text from the responses above
-
-Return valid JSON matching the schema.`;
+  return renderPrompt(config.prompts.themeExtraction, {
+    count: sacrifices.length,
+    responses: sacrifices.map((s, i) => `${i + 1}. "${s}"`).join("\n"),
+  });
 }
 
 export async function extractThemes(): Promise<ExtractedTheme[] | null> {
@@ -39,7 +22,7 @@ export async function extractThemes(): Promise<ExtractedTheme[] | null> {
     getSubmissionCount(),
   ]);
 
-  if (sacrifices.length < 5) {
+  if (sacrifices.length < config.operational.minSubmissionsForAI) {
     return null;
   }
 
@@ -99,9 +82,9 @@ export async function shouldExtract(): Promise<boolean> {
     getLatestThemeExtraction(),
   ]);
 
-  if (currentCount < 5) return false;
+  if (currentCount < config.operational.minSubmissionsForAI) return false;
   if (!latest) return true;
-  return currentCount - latest.submissionCount >= EXTRACTION_INTERVAL;
+  return currentCount - latest.submissionCount >= config.operational.themeExtractionInterval;
 }
 
 export async function maybeExtractThemes(): Promise<ExtractedTheme[] | null> {

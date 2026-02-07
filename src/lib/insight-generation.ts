@@ -10,11 +10,9 @@ import {
   getLatestInsight,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { config } from "@/config";
 import { db } from "@/db";
 import { insightSnapshots } from "@/db/schema";
-
-const INSIGHT_INTERVAL = 5;
-const INSIGHT_COOLDOWN_MS = 60 * 60 * 1000;
 
 let insightInProgress = false;
 
@@ -24,13 +22,16 @@ export async function shouldGenerateInsight(): Promise<boolean> {
     getLatestInsight(),
   ]);
 
-  if (currentCount < 5) return false;
+  if (currentCount < config.operational.minSubmissionsForAI) return false;
   if (!latest) return true;
 
   const sinceLastInsight = currentCount - latest.submissionCount;
   const elapsed = Date.now() - new Date(latest.createdAt).getTime();
 
-  return sinceLastInsight >= INSIGHT_INTERVAL && elapsed >= INSIGHT_COOLDOWN_MS;
+  return (
+    sinceLastInsight >= config.operational.insightInterval &&
+    elapsed >= config.operational.insightCooldownMs
+  );
 }
 
 export async function generateInsight(): Promise<string | null> {

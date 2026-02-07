@@ -1,3 +1,4 @@
+import { config } from "@/config";
 import { getLatestInsight } from "@/lib/db-queries";
 import { InsightDisplay } from "@/components/insights/InsightDisplay";
 import { StatsDashboard } from "@/components/stats/StatsDashboard";
@@ -11,9 +12,9 @@ export default async function InsightsPage() {
     <main className="mx-auto max-w-3xl px-4 py-12">
       <div className="mb-8 animate-fade-in">
         <hr className="section-rule mb-4 w-16" />
-        <h1 className="font-display text-3xl font-bold">Community Voice</h1>
+        <h1 className="font-display text-3xl font-bold">{config.pages.insights.heading}</h1>
         <p className="mt-2 text-muted">
-          AI-generated insights from what our community is telling us.
+          {config.pages.insights.subtext}
         </p>
       </div>
 
