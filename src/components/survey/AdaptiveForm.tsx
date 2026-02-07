@@ -60,24 +60,26 @@ export function AdaptiveForm({
           )}
 
           {q.input_type === "scale" && (
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5].map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() =>
-                    setAnswers((prev) => ({ ...prev, [i]: n }))
-                  }
-                  className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm transition-all ${
-                    answers[i] === n
-                      ? "border-accent bg-accent-subtle text-foreground shadow-warm"
-                      : "border-border hover:border-border-strong"
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
-              <div className="mt-1 flex w-full justify-between text-xs text-muted">
+            <div>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() =>
+                      setAnswers((prev) => ({ ...prev, [i]: n }))
+                    }
+                    className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm transition-all ${
+                      answers[i] === n
+                        ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+                        : "border-border hover:border-border-strong"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-1 flex justify-between text-xs text-muted">
                 <span>{q.scale_min_label ?? "1"}</span>
                 <span>{q.scale_max_label ?? "5"}</span>
               </div>
