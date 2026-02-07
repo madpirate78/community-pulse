@@ -1,8 +1,24 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const messages = [
+  "Thinking about what to ask you next...",
+  "Reading what you shared...",
+  "Tailoring follow-up questions...",
+];
 
 export function ShimmerLoader() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % messages.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <motion.div
       className="space-y-4 py-8 text-center"
@@ -30,7 +46,17 @@ export function ShimmerLoader() {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
           />
         </svg>
-        Thinking about what to ask you next...
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={index}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            {messages[index]}
+          </motion.span>
+        </AnimatePresence>
       </div>
       <div className="mx-auto max-w-md space-y-3">
         <div className="h-4 animate-pulse rounded bg-border" />
