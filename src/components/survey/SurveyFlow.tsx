@@ -47,13 +47,15 @@ export function SurveyFlow() {
         }
       }
 
-      if (res.status === 429) {
+      if (!res.ok) {
         setBusyMessage("The server is busy right now. Please try again in a moment.");
         setStage("fixed");
         return;
       }
     } catch {
-      // If adaptive questions fail, just submit without them
+      setBusyMessage("The server is busy right now. Please try again in a moment.");
+      setStage("fixed");
+      return;
     }
 
     doSubmit(answers, null);
