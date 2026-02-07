@@ -32,9 +32,12 @@
   }
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
   color: var(--text);
-  background: var(--bg);
 }
 
 /* ── Typography ── */

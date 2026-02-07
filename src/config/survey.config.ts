@@ -225,7 +225,7 @@ Return JSON matching the schema.`,
   operational: {
     themeExtractionInterval: 5,
     insightInterval: 5,
-    insightCooldownMs: 60 * 60 * 1000, // 1 hour
+    insightCooldownMs: 0,
     statisticsCacheTtlMs: 60_000, // 60 seconds
     minSubmissionsForAI: 5,
   },
