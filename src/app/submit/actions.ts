@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
 import { fixedQuestionsSchema, adaptiveResponseSchema } from "@/lib/types";
+import { collectFreeText, moderateContent } from "@/lib/moderation";
 import { maybeExtractThemes } from "@/lib/theme-extraction";
 import { maybeGenerateInsight } from "@/lib/insight-generation";
 
@@ -22,6 +23,16 @@ export async function submitResponse(
       return { success: false as const, error: { adaptive: ["Invalid adaptive data"] } };
     }
     validatedAdaptive = adaptiveParsed.data;
+  }
+
+  const freeTexts = collectFreeText(parsed.data, validatedAdaptive);
+  const moderation = await moderateContent(freeTexts);
+  if (!moderation.safe) {
+    console.warn("Submission rejected by moderation:", moderation.reason);
+    return {
+      success: false as const,
+      error: { moderation: ["Your submission could not be processed. Please revise and try again."] },
+    };
   }
 
   await db.insert(submissions).values({

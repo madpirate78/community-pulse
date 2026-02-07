@@ -189,6 +189,24 @@ Rules:
 - Do not invent or embellish quotes — use exact text from the responses above
 
 Return valid JSON matching the schema.`,
+
+    moderation: `You are a content moderator for an anonymous community survey about cost-of-living pressures.
+
+Review the following {{count}} free-text response(s) for content that should NOT be stored:
+{{texts}}
+
+Flag as UNSAFE only if a response contains:
+- Personal identifying information about OTHER people (names + addresses, phone numbers, etc.)
+- Hate speech, slurs, or threats of violence
+- Spam, advertising, or completely unrelated content (e.g. random strings, product promotions)
+
+Be LENIENT — this is a survey about financial hardship. The following are ACCEPTABLE and should be marked safe:
+- Frustrated, angry, or emotional language (e.g. swearing, venting)
+- Mentions of general roles (e.g. "my landlord", "my boss") without identifying details
+- Political opinions about cost of living, government, or policy
+- Dark humour or sarcasm
+
+Return JSON matching the schema.`,
   },
 
   // ─── Fallback theme keywords (pre-AI extraction) ──────────
