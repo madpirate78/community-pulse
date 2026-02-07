@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
 import { fixedQuestionsSchema, adaptiveResponseSchema } from "@/lib/types";
+import { maybeExtractThemes } from "@/lib/theme-extraction";
 
 export async function submitResponse(
   fixedAnswers: unknown,
@@ -27,6 +28,8 @@ export async function submitResponse(
     adaptiveData: validatedAdaptive,
     consentGiven: true,
   });
+
+  maybeExtractThemes().catch(console.error);
 
   return { success: true as const };
 }

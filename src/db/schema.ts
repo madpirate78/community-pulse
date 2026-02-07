@@ -21,6 +21,21 @@ export const submissions = sqliteTable("submissions", {
   consentGiven: integer("consent_given", { mode: "boolean" }).notNull(),
 });
 
+export const extractedThemes = sqliteTable("extracted_themes", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  createdAt: text("created_at")
+    .default(sql`(datetime('now'))`)
+    .notNull(),
+  themes: text("themes", { mode: "json" })
+    .notNull()
+    .$type<import("@/lib/types").ExtractedTheme[]>(),
+  submissionCount: integer("submission_count").notNull(),
+  modelUsed: text("model_used").notNull(),
+  generationTimeMs: integer("generation_time_ms"),
+});
+
 export const insightSnapshots = sqliteTable("insight_snapshots", {
   id: text("id")
     .primaryKey()
