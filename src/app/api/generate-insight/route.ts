@@ -10,6 +10,8 @@ import {
 import { PRESSURE_LABELS } from "@/lib/types";
 import { aiLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
+import { db } from "@/db";
+import { insightSnapshots } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +25,7 @@ async function sleep(ms: number) {
 export async function POST(req: Request) {
   const blocked = applyRateLimit(req, aiLimiter);
   if (blocked) return blocked;
+  const start = Date.now();
   try {
     const [summary, sacrifices, adaptiveData, pressureCounts, recent] =
       await Promise.all([
@@ -68,17 +71,32 @@ export async function POST(req: Request) {
         });
 
         const encoder = new TextEncoder();
+        let fullText = "";
         const stream = new ReadableStream({
           async start(controller) {
             try {
               for await (const chunk of response) {
                 const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (text) {
+                  fullText += text;
                   controller.enqueue(encoder.encode(text));
                 }
               }
             } finally {
               controller.close();
+              if (fullText) {
+                try {
+                  await db.insert(insightSnapshots).values({
+                    insightText: fullText,
+                    dataSummary: summary as unknown as Record<string, unknown>,
+                    submissionCount: summary.total_responses,
+                    modelUsed: MODELS.thinking,
+                    generationTimeMs: Date.now() - start,
+                  });
+                } catch (err) {
+                  console.error("Failed to persist insight snapshot:", err);
+                }
+              }
             }
           },
         });
