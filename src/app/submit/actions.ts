@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { submissions } from "@/db/schema";
 import { fixedQuestionsSchema, adaptiveResponseSchema } from "@/lib/types";
 import { maybeExtractThemes } from "@/lib/theme-extraction";
+import { maybeGenerateInsight } from "@/lib/insight-generation";
 
 export async function submitResponse(
   fixedAnswers: unknown,
@@ -29,7 +30,9 @@ export async function submitResponse(
     consentGiven: true,
   });
 
-  maybeExtractThemes().catch(console.error);
+  maybeExtractThemes()
+    .then(() => maybeGenerateInsight())
+    .catch(console.error);
 
   return { success: true as const };
 }
