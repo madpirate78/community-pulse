@@ -27,6 +27,7 @@ async function seed() {
       responses,
       adaptiveData: adaptiveData ?? null,
       consentGiven: true,
+      contentSafe: true,
       createdAt,
     });
   }

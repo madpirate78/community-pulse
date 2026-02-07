@@ -15,6 +15,7 @@ export const submissions = sqliteTable("submissions", {
     Record<string, unknown>[] | null
   >(),
   consentGiven: integer("consent_given", { mode: "boolean" }).notNull(),
+  contentSafe: integer("content_safe", { mode: "boolean" }),
 });
 
 export const extractedThemes = sqliteTable("extracted_themes", {

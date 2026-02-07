@@ -103,6 +103,7 @@ export const surveyConfigSchema = z.object({
     insightSystem: z.string(),
     insightUser: z.string(),
     themeExtraction: z.string(),
+    moderation: z.string(),
   }),
 
   fallbackThemeKeywords: z.record(z.string(), z.array(z.string())),

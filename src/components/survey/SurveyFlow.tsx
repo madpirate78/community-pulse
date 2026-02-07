@@ -25,6 +25,7 @@ export function SurveyFlow() {
   const [adaptiveQuestions, setAdaptiveQuestions] =
     useState<AdaptiveQuestions | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   async function handleFixedSubmit(answers: Record<string, unknown>) {
     setFixedAnswers(answers);
@@ -63,12 +64,16 @@ export function SurveyFlow() {
     adaptive: Record<string, unknown>[] | null
   ) {
     setIsSubmitting(true);
+    setSubmitError(null);
     setStage("submitting");
     const result = await submitResponse(fixed, adaptive);
     if (result.success) {
       setStage("done");
       router.push("/thank-you");
     } else {
+      const errorObj = result.error as Record<string, string[]> | undefined;
+      const message = errorObj?.moderation?.[0] ?? null;
+      setSubmitError(message);
       setIsSubmitting(false);
       setStage("fixed");
     }
@@ -94,6 +99,11 @@ export function SurveyFlow() {
 
       {stage === "fixed" && (
         <motion.div key="fixed" {...stageMotion}>
+          {submitError && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+              {submitError}
+            </div>
+          )}
           <FixedQuestionsForm
             onSubmit={handleFixedSubmit}
             isSubmitting={isSubmitting}
