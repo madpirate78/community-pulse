@@ -1,5 +1,5 @@
 import { getLatestInsight } from "@/lib/db-queries";
-import { StreamingInsight } from "@/components/insights/StreamingInsight";
+import { InsightDisplay } from "@/components/insights/InsightDisplay";
 import { StatsDashboard } from "@/components/stats/StatsDashboard";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export default async function InsightsPage() {
       </div>
 
       <section className="mb-12">
-        <StreamingInsight cachedInsight={latest?.insightText ?? null} />
+        <InsightDisplay cachedInsight={latest?.insightText ?? null} />
         {latest && (
           <p className="mt-3 text-xs text-muted">
             Last generated from {latest.submissionCount} responses
