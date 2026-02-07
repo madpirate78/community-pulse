@@ -6,12 +6,12 @@ import {
   getDatasetSummary,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { config } from "@/config";
 import { readLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
 
 export const dynamic = "force-dynamic";
 
-const CACHE_TTL_MS = 60_000; // 60 seconds
 let cachedResponse: { data: unknown; expiresAt: number } | null = null;
 
 export async function GET(req: Request) {
@@ -39,7 +39,7 @@ export async function GET(req: Request) {
     .sort((a, b) => b.count - a.count);
 
   const data = { total, avgChange, pressures, summary };
-  cachedResponse = { data, expiresAt: Date.now() + CACHE_TTL_MS };
+  cachedResponse = { data, expiresAt: Date.now() + config.operational.statisticsCacheTtlMs };
 
   return NextResponse.json(data);
 }

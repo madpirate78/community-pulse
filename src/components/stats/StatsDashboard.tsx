@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { pages } from "@/config/client";
 import { PressureChart } from "./PressureChart";
 import { StatsBar } from "./StatsBar";
 
@@ -46,9 +47,9 @@ export function StatsDashboard() {
   if (!data || data.total === 0) {
     return (
       <div className="rounded-xl border-2 border-dashed border-accent/30 p-8 text-center text-muted">
-        <p className="text-lg font-medium">No submissions yet</p>
+        <p className="text-lg font-medium">{pages.statistics.emptyHeading}</p>
         <p className="mt-1 text-sm">
-          Be the first to add your voice.
+          {pages.statistics.emptyBody}
         </p>
       </div>
     );
@@ -70,7 +71,7 @@ export function StatsDashboard() {
 
       <div>
         <h3 className="mb-3 font-display text-lg font-semibold">
-          Biggest Pressures
+          {pages.statistics.pressuresHeading}
         </h3>
         <PressureChart data={data.pressures} />
       </div>
@@ -78,7 +79,7 @@ export function StatsDashboard() {
       {data.summary.sacrifice_themes.length > 0 && (
         <div>
           <h3 className="mb-3 font-display text-lg font-semibold">
-            What People Are Giving Up
+            {pages.statistics.themesHeading}
           </h3>
           <div className="flex flex-wrap gap-2">
             {data.summary.sacrifice_themes.map((theme) => (

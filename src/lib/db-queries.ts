@@ -1,8 +1,14 @@
 import { db } from "@/db";
 import { submissions, insightSnapshots, extractedThemes } from "@/db/schema";
 import { count, desc, sql, eq, and } from "drizzle-orm";
+import { config } from "@/config";
 import type { DatasetSummary, ExtractedTheme, PressureOption } from "./types";
 import { PRESSURE_OPTIONS } from "./types";
+
+// Derive field names from config questions
+const choiceField = config.questions.fixed.find((q) => q.type === "choice")?.fieldName ?? "biggest_pressure";
+const scaleField = config.questions.fixed.find((q) => q.type === "scale")?.fieldName ?? "change_direction";
+const textField = config.questions.fixed.find((q) => q.type === "text")?.fieldName ?? "sacrifice";
 
 export async function getSubmissionCount(): Promise<number> {
   const [row] = await db
@@ -27,12 +33,12 @@ export async function getPressureCounts(): Promise<
 > {
   const rows = await db
     .select({
-      pressure: sql<string>`json_extract(${submissions.responses}, '$.biggest_pressure')`,
+      pressure: sql<string>`json_extract(${submissions.responses}, '$.' || ${choiceField})`,
       total: count(),
     })
     .from(submissions)
     .where(eq(submissions.consentGiven, true))
-    .groupBy(sql`json_extract(${submissions.responses}, '$.biggest_pressure')`);
+    .groupBy(sql`json_extract(${submissions.responses}, '$.' || ${choiceField})`);
 
   const counts = Object.fromEntries(
     PRESSURE_OPTIONS.map((p) => [p, 0])
@@ -50,7 +56,7 @@ export async function getPressureCounts(): Promise<
 export async function getAverageChangeDirection(): Promise<number> {
   const [row] = await db
     .select({
-      avg: sql<number>`ROUND(AVG(json_extract(${submissions.responses}, '$.change_direction')), 1)`,
+      avg: sql<number>`ROUND(AVG(json_extract(${submissions.responses}, '$.' || ${scaleField})), 1)`,
     })
     .from(submissions)
     .where(eq(submissions.consentGiven, true));
@@ -65,8 +71,8 @@ export async function getAllSacrifices(): Promise<string[]> {
     .where(eq(submissions.consentGiven, true));
 
   return allSubs
-    .map((s) => (s.responses as { sacrifice?: string })?.sacrifice)
-    .filter((s): s is string => Boolean(s));
+    .map((s) => (s.responses as Record<string, unknown>)?.[textField])
+    .filter((s): s is string => typeof s === "string" && Boolean(s));
 }
 
 export async function getAllAdaptiveData(): Promise<Record<string, unknown>[]> {
@@ -139,16 +145,7 @@ export async function getDatasetSummary(): Promise<DatasetSummary> {
 function extractSimpleThemes(sacrifices: string[]): string[] {
   if (sacrifices.length === 0) return [];
 
-  const themeKeywords: Record<string, string[]> = {
-    socialising: ["friends", "social", "going out", "pub", "restaurant"],
-    heating: ["heating", "heat", "warm", "thermostat"],
-    "food quality": ["fresh", "fruit", "organic", "meat", "quality"],
-    hobbies: ["gym", "hobby", "sport", "club", "membership"],
-    holidays: ["holiday", "travel", "vacation", "trip"],
-    transport: ["car", "petrol", "bus", "train", "commute"],
-    childcare: ["childcare", "nursery", "school"],
-    entertainment: ["streaming", "netflix", "cinema", "entertainment"],
-  };
+  const themeKeywords = config.fallbackThemeKeywords;
 
   const counts: Record<string, number> = {};
   const lowerSacrifices = sacrifices.map((s) => s.toLowerCase());

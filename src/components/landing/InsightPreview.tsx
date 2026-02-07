@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { pages } from "@/config/client";
 
 interface InsightPreviewProps {
   insightText: string | null;
@@ -23,7 +24,7 @@ export function InsightPreview({ insightText }: InsightPreviewProps) {
       transition={{ duration: 0.5, delay: 0.4 }}
     >
       <h2 className="mb-4 text-center font-display text-xl font-bold">
-        What the community is saying
+        {pages.insights.previewHeading}
       </h2>
       <blockquote className="relative overflow-hidden rounded-xl border border-border bg-surface p-6 text-muted italic shadow-warm">
         <span className="absolute -left-1 -top-3 font-display text-6xl leading-none text-accent opacity-15">
@@ -38,7 +39,7 @@ export function InsightPreview({ insightText }: InsightPreviewProps) {
           href="/insights"
           className="group text-sm font-medium text-accent transition-colors hover:text-accent-hover"
         >
-          Read the full Community Voice{" "}
+          {pages.insights.previewLink}{" "}
           <span className="inline-block transition-transform group-hover:translate-x-1">
             &rarr;
           </span>

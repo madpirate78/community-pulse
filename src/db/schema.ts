@@ -10,11 +10,7 @@ export const submissions = sqliteTable("submissions", {
     .notNull(),
   responses: text("responses", { mode: "json" })
     .notNull()
-    .$type<{
-      biggest_pressure: string;
-      change_direction: number;
-      sacrifice: string;
-    }>(),
+    .$type<Record<string, unknown>>(),
   adaptiveData: text("adaptive_data", { mode: "json" }).$type<
     Record<string, unknown>[] | null
   >(),

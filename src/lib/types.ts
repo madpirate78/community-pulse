@@ -1,32 +1,68 @@
 import { z } from "zod";
+import { config } from "@/config";
+import type { ChoiceQuestion, ScaleQuestion } from "@/config/schema";
 
-// ─── Fixed Questions (everyone answers these) ─────────────────
+// ─── Dynamic fixed-questions schema from config ─────────────
 
-export const PRESSURE_OPTIONS = [
-  "housing",
-  "food",
-  "energy",
-  "transport",
-  "childcare",
-  "healthcare",
-  "debt",
-  "other",
-] as const;
+function buildFixedSchema() {
+  const shape: Record<string, z.ZodTypeAny> = {};
 
-export type PressureOption = (typeof PRESSURE_OPTIONS)[number];
+  for (const q of config.questions.fixed) {
+    switch (q.type) {
+      case "choice": {
+        const values = q.options.map((o) => o.value) as [string, ...string[]];
+        shape[q.fieldName] = z.enum(values);
+        break;
+      }
+      case "scale":
+        shape[q.fieldName] = z.coerce.number().min(q.min).max(q.max);
+        break;
+      case "text":
+        shape[q.fieldName] = z
+          .string()
+          .min(q.minLength, `Please share at least a brief answer`)
+          .max(q.maxLength, `Please keep this brief — under ${q.maxLength} characters`);
+        break;
+    }
+  }
 
-export const fixedQuestionsSchema = z.object({
-  biggest_pressure: z.enum(PRESSURE_OPTIONS),
-  change_direction: z.coerce.number().min(1).max(5),
-  sacrifice: z
-    .string()
-    .min(2, "Please share at least a brief answer")
-    .max(200, "Please keep this brief — under 200 characters"),
-});
+  return z.object(shape);
+}
 
+export const fixedQuestionsSchema = buildFixedSchema();
 export type FixedAnswers = z.infer<typeof fixedQuestionsSchema>;
 
-// ─── Adaptive Questions (AI-generated follow-ups) ─────────────
+// ─── Config-derived helpers (backward-compat) ───────────────
+
+function findQuestion<T extends "choice" | "scale" | "text">(type: T) {
+  return config.questions.fixed.filter((q) => q.type === type);
+}
+
+const choiceQuestions = findQuestion("choice") as ChoiceQuestion[];
+const scaleQuestions = findQuestion("scale") as ScaleQuestion[];
+
+// First choice question's option values (was PRESSURE_OPTIONS)
+const firstChoice = choiceQuestions[0];
+export const PRESSURE_OPTIONS = firstChoice
+  ? (firstChoice.options.map((o) => o.value) as readonly string[])
+  : ([] as readonly string[]);
+
+export type PressureOption = string;
+
+// First choice question's value→label map (was PRESSURE_LABELS)
+export const PRESSURE_LABELS: Record<string, string> = firstChoice
+  ? Object.fromEntries(firstChoice.options.map((o) => [o.value, o.label]))
+  : {};
+
+// First scale question's number→label map (was CHANGE_LABELS)
+const firstScale = scaleQuestions[0];
+export const CHANGE_LABELS: Record<number, string> = firstScale
+  ? Object.fromEntries(
+      Object.entries(firstScale.labels).map(([k, v]) => [Number(k), v])
+    )
+  : {};
+
+// ─── Adaptive Questions (AI-generated follow-ups) ───────────
 
 export const adaptiveQuestionSchema = z.object({
   questions: z
@@ -87,24 +123,3 @@ export interface DatasetSummary {
   emerging_gap: string | null;
   ai_themes: ExtractedTheme[] | null;
 }
-
-// ─── UI Labels ────────────────────────────────────────────────
-
-export const PRESSURE_LABELS: Record<string, string> = {
-  housing: "Housing costs",
-  food: "Food & groceries",
-  energy: "Energy bills",
-  transport: "Getting around",
-  childcare: "Childcare",
-  healthcare: "Healthcare",
-  debt: "Debt & borrowing",
-  other: "Other",
-};
-
-export const CHANGE_LABELS: Record<number, string> = {
-  1: "Much better",
-  2: "A bit better",
-  3: "Same",
-  4: "Worse",
-  5: "Much worse",
-};

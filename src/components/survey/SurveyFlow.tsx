@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import type { FixedAnswers, AdaptiveQuestions } from "@/lib/types";
+import type { AdaptiveQuestions } from "@/lib/types";
 import { FixedQuestionsForm } from "./FixedQuestionsForm";
 import { ShimmerLoader } from "./ShimmerLoader";
 import { AdaptiveForm } from "./AdaptiveForm";
@@ -21,12 +21,12 @@ const stageMotion = {
 export function SurveyFlow() {
   const router = useRouter();
   const [stage, setStage] = useState<Stage>("fixed");
-  const [fixedAnswers, setFixedAnswers] = useState<FixedAnswers | null>(null);
+  const [fixedAnswers, setFixedAnswers] = useState<Record<string, unknown> | null>(null);
   const [adaptiveQuestions, setAdaptiveQuestions] =
     useState<AdaptiveQuestions | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleFixedSubmit(answers: FixedAnswers) {
+  async function handleFixedSubmit(answers: Record<string, unknown>) {
     setFixedAnswers(answers);
     setStage("loading");
 
@@ -59,7 +59,7 @@ export function SurveyFlow() {
   }
 
   async function doSubmit(
-    fixed: FixedAnswers,
+    fixed: Record<string, unknown>,
     adaptive: Record<string, unknown>[] | null
   ) {
     setIsSubmitting(true);
