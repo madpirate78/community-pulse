@@ -1,4 +1,3 @@
-import { ThinkingLevel } from "@google/genai";
 import { NextResponse } from "next/server";
 import { getAI, MODELS } from "@/lib/gemini";
 import { db } from "@/db";
@@ -63,11 +62,6 @@ export async function POST(req: Request) {
       contents: [
         { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
       ],
-      config: {
-        thinkingConfig: {
-          thinkingLevel: ThinkingLevel.LOW,
-        },
-      },
     });
 
     const insightText = response.text ?? "";
