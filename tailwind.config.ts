@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        parchment: "var(--bg)",
+        canvas: "var(--bg)",
         surface: "var(--bg-surface)",
         foreground: "var(--text)",
         muted: "var(--text-muted)",
@@ -18,6 +18,11 @@ const config: Config = {
           hover: "var(--accent-hover)",
           subtle: "var(--accent-subtle)",
           glow: "var(--accent-glow)",
+        },
+        data: {
+          DEFAULT: "var(--data)",
+          subtle: "var(--data-subtle)",
+          glow: "var(--data-glow)",
         },
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
@@ -34,9 +39,9 @@ const config: Config = {
         "cursor-pulse": "cursor-pulse 1s ease-in-out infinite",
       },
       boxShadow: {
-        warm: "0 1px 3px rgba(28, 25, 23, 0.06), 0 4px 12px rgba(28, 25, 23, 0.04)",
-        "warm-lg": "0 4px 6px rgba(28, 25, 23, 0.06), 0 10px 24px rgba(28, 25, 23, 0.08)",
-        "warm-xl": "0 8px 16px rgba(28, 25, 23, 0.06), 0 20px 40px rgba(28, 25, 23, 0.1)",
+        soft: "0 1px 3px rgba(28, 25, 23, 0.06), 0 4px 12px rgba(28, 25, 23, 0.04)",
+        "soft-lg": "0 4px 6px rgba(28, 25, 23, 0.06), 0 10px 24px rgba(28, 25, 23, 0.08)",
+        "soft-xl": "0 8px 16px rgba(28, 25, 23, 0.06), 0 20px 40px rgba(28, 25, 23, 0.1)",
       },
     },
   },

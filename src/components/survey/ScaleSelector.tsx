@@ -22,7 +22,7 @@ export function ScaleSelector({ min, max, labels, value, onChange }: ScaleSelect
             onClick={() => onChange(n)}
             className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm font-medium transition-all ${
               value === n
-                ? "border-accent bg-accent-subtle text-foreground shadow-warm"
+                ? "border-accent bg-accent-subtle text-foreground shadow-soft"
                 : "border-border hover:border-border-strong"
             }`}
           >

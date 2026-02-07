@@ -84,7 +84,7 @@ export function FixedQuestionsForm({
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
+        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50"
       >
         Continue
       </button>

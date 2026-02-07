@@ -15,7 +15,7 @@ export default function ThankYouPage() {
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/insights"
-            className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98]"
+            className="rounded-xl bg-accent px-6 py-3 font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98]"
           >
             {ctaInsights}
           </Link>

@@ -1,13 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { PRESSURE_LABELS } from "@/lib/types";
-import { motion } from "framer-motion";
+import { motion, useSpring, useMotionValueEvent } from "framer-motion";
 
 interface StatsBarProps {
   total: number;
   topPressure: string;
   topPressurePct: number;
   avgChange: number;
+}
+
+function AnimatedNumber({ value, decimals = 0 }: { value: number; decimals?: number }) {
+  const spring = useSpring(0, { stiffness: 50, damping: 20 });
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    spring.set(value);
+  }, [spring, value]);
+
+  useMotionValueEvent(spring, "change", (v) => {
+    setDisplay(Number(v.toFixed(decimals)));
+  });
+
+  return <>{display}</>;
 }
 
 export function StatsBar({
@@ -24,16 +40,16 @@ export function StatsBar({
       transition={{ duration: 0.4, delay: 0.3 }}
     >
       <span className="font-semibold text-accent">
-        {total} {total === 1 ? "voice" : "voices"}
+        <AnimatedNumber value={total} /> {total === 1 ? "voice" : "voices"}
       </span>
       <span className="text-muted" aria-hidden="true">&middot;</span>
       <span className="text-muted">
         Top concern: {PRESSURE_LABELS[topPressure] ?? topPressure} (
-        {topPressurePct}%)
+        <AnimatedNumber value={topPressurePct} />%)
       </span>
       <span className="text-muted" aria-hidden="true">&middot;</span>
       <span className="text-muted">
-        Avg change: <span className="font-mono text-foreground">{avgChange}/5</span>
+        Avg change: <span className="font-mono text-foreground"><AnimatedNumber value={avgChange} decimals={1} />/5</span>
       </span>
     </motion.div>
   );

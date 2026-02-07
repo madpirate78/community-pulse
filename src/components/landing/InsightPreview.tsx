@@ -26,11 +26,13 @@ export function InsightPreview({ insightText }: InsightPreviewProps) {
       <h2 className="mb-4 text-center font-display text-xl font-bold">
         {pages.insights.previewHeading}
       </h2>
-      <blockquote className="relative rounded-xl border border-border bg-surface p-6 text-muted italic shadow-warm">
-        <span className="absolute left-2 top-1 font-display text-6xl leading-none text-accent opacity-15">
+      <blockquote className="relative overflow-hidden rounded-xl border border-border bg-surface p-6 text-muted italic shadow-soft">
+        <span
+          className="absolute left-2 top-1 bg-gradient-to-br from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] bg-clip-text font-display text-6xl leading-none text-transparent opacity-20"
+        >
           &ldquo;
         </span>
-        <span className="relative block border-l-4 border-accent pl-4 font-display">
+        <span className="relative block border-l-4 border-transparent pl-4 font-display" style={{ borderImage: "linear-gradient(to bottom, var(--gradient-start), var(--gradient-end)) 1" }}>
           {preview}
         </span>
       </blockquote>
