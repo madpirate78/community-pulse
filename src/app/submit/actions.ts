@@ -27,40 +27,28 @@ export async function submitResponse(
 
   const freeTexts = collectFreeText(parsed.data, validatedAdaptive);
 
+  let contentSafe: boolean | null;
   try {
     const moderation = await moderateContent(freeTexts);
+    contentSafe = moderation.safe;
+  } catch {
+    // Moderation API error — mark for background retry
+    contentSafe = freeTexts.length === 0 ? true : null;
+  }
 
-    if (!moderation.safe) {
-      console.warn("Submission rejected by moderation:", moderation.reason);
-      return {
-        success: false as const,
-        error: { moderation: ["Your submission could not be processed. Please revise and try again."] },
-      };
-    }
-
-    // Safe — insert with contentSafe: true
-    await db.insert(submissions).values({
+  const [inserted] = await db
+    .insert(submissions)
+    .values({
       responses: parsed.data,
       adaptiveData: validatedAdaptive,
       consentGiven: true,
-      contentSafe: true,
-    });
-  } catch {
-    // Moderation API error — store submission but gate free-text from AI
-    const [inserted] = await db
-      .insert(submissions)
-      .values({
-        responses: parsed.data,
-        adaptiveData: validatedAdaptive,
-        consentGiven: true,
-        contentSafe: freeTexts.length === 0 ? true : null,
-      })
-      .returning({ id: submissions.id });
+      contentSafe,
+    })
+    .returning({ id: submissions.id });
 
-    if (freeTexts.length > 0) {
-      console.warn(`Moderation API error — submission ${inserted.id} stored with contentSafe=null, retrying in background`);
-      retryModeration(inserted.id, freeTexts).catch(console.error);
-    }
+  if (contentSafe === null) {
+    console.warn(`Moderation API error — submission ${inserted.id} stored with contentSafe=null, retrying in background`);
+    retryModeration(inserted.id, freeTexts).catch(console.error);
   }
 
   maybeExtractThemes()
