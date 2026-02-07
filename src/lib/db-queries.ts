@@ -68,7 +68,12 @@ export async function getAllSacrifices(): Promise<string[]> {
   const allSubs = await db
     .select({ responses: submissions.responses })
     .from(submissions)
-    .where(eq(submissions.consentGiven, true));
+    .where(
+      and(
+        eq(submissions.consentGiven, true),
+        eq(submissions.contentSafe, true)
+      )
+    );
 
   return allSubs
     .map((s) => (s.responses as Record<string, unknown>)?.[textField])
@@ -82,6 +87,7 @@ export async function getAllAdaptiveData(): Promise<Record<string, unknown>[]> {
     .where(
       and(
         eq(submissions.consentGiven, true),
+        eq(submissions.contentSafe, true),
         sql`${submissions.adaptiveData} IS NOT NULL`
       )
     );

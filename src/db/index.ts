@@ -20,7 +20,8 @@ function createDb() {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       responses TEXT NOT NULL,
       adaptive_data TEXT,
-      consent_given INTEGER NOT NULL
+      consent_given INTEGER NOT NULL,
+      content_safe INTEGER
     );
     CREATE TABLE IF NOT EXISTS extracted_themes (
       id TEXT PRIMARY KEY,
