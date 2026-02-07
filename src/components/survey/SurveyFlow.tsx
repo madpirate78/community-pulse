@@ -24,9 +24,11 @@ export function SurveyFlow() {
   const [fixedAnswers, setFixedAnswers] = useState<Record<string, unknown> | null>(null);
   const [adaptiveQuestions, setAdaptiveQuestions] =
     useState<AdaptiveQuestions | null>(null);
+  const [busyMessage, setBusyMessage] = useState<string | null>(null);
 
   async function handleFixedSubmit(answers: Record<string, unknown>) {
     setFixedAnswers(answers);
+    setBusyMessage(null);
     setStage("loading");
 
     try {
@@ -44,8 +46,16 @@ export function SurveyFlow() {
           return;
         }
       }
+
+      if (!res.ok) {
+        setBusyMessage("The server is busy right now. Please try again in a moment.");
+        setStage("fixed");
+        return;
+      }
     } catch {
-      // If adaptive questions fail, just submit without them
+      setBusyMessage("The server is busy right now. Please try again in a moment.");
+      setStage("fixed");
+      return;
     }
 
     doSubmit(answers, null);
@@ -85,7 +95,12 @@ export function SurveyFlow() {
 
       {stage === "fixed" && (
         <motion.div key="fixed" {...stageMotion}>
-          <FixedQuestionsForm onSubmit={handleFixedSubmit} />
+          {busyMessage && (
+            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {busyMessage}
+            </div>
+          )}
+          <FixedQuestionsForm onSubmit={handleFixedSubmit} defaultValues={fixedAnswers} />
         </motion.div>
       )}
     </AnimatePresence>
