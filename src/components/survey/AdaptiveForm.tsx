@@ -6,13 +6,11 @@ import type { AdaptiveQuestions } from "@/lib/types";
 interface AdaptiveFormProps {
   questions: AdaptiveQuestions;
   onSubmit: (answers: Record<string, unknown>[]) => void;
-  isSubmitting?: boolean;
 }
 
 export function AdaptiveForm({
   questions,
   onSubmit,
-  isSubmitting,
 }: AdaptiveFormProps) {
   const [answers, setAnswers] = useState<Record<number, unknown>>({});
 
@@ -103,10 +101,9 @@ export function AdaptiveForm({
 
       <button
         type="submit"
-        disabled={isSubmitting}
         className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
       >
-        {isSubmitting ? "Submitting..." : "Submit Your Voice"}
+        Submit Your Voice
       </button>
     </form>
   );

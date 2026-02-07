@@ -8,12 +8,10 @@ import { ScaleSelector } from "./ScaleSelector";
 
 interface FixedQuestionsFormProps {
   onSubmit: (answers: Record<string, unknown>) => void;
-  isSubmitting?: boolean;
 }
 
 export function FixedQuestionsForm({
   onSubmit,
-  isSubmitting,
 }: FixedQuestionsFormProps) {
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -84,10 +82,9 @@ export function FixedQuestionsForm({
 
       <button
         type="submit"
-        disabled={isSubmitting}
         className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-warm-lg active:scale-[0.98] disabled:opacity-50"
       >
-        {isSubmitting ? "Submitting..." : "Continue"}
+        Continue
       </button>
     </form>
   );
