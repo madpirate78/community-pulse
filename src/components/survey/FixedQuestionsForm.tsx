@@ -8,12 +8,14 @@ import { ScaleSelector } from "./ScaleSelector";
 
 interface FixedQuestionsFormProps {
   onSubmit: (answers: Record<string, unknown>) => void;
+  defaultValues?: Record<string, unknown> | null;
 }
 
 export function FixedQuestionsForm({
   onSubmit,
+  defaultValues,
 }: FixedQuestionsFormProps) {
-  const [values, setValues] = useState<Record<string, unknown>>({});
+  const [values, setValues] = useState<Record<string, unknown>>(defaultValues ?? {});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function setValue(fieldName: string, value: unknown) {

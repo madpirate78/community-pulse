@@ -100,7 +100,7 @@ export function SurveyFlow() {
               {busyMessage}
             </div>
           )}
-          <FixedQuestionsForm onSubmit={handleFixedSubmit} />
+          <FixedQuestionsForm onSubmit={handleFixedSubmit} defaultValues={fixedAnswers} />
         </motion.div>
       )}
     </AnimatePresence>
