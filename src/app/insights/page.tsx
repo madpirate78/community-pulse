@@ -1,6 +1,6 @@
 import { config } from "@/config";
 import { getLatestInsight } from "@/lib/db-queries";
-import { InsightDisplay } from "@/components/insights/InsightDisplay";
+import { InsightSection } from "@/components/insights/InsightSection";
 import { StatsDashboard } from "@/components/stats/StatsDashboard";
 
 export const dynamic = "force-dynamic";
@@ -19,15 +19,11 @@ export default async function InsightsPage() {
       </div>
 
       <section className="mb-12">
-        <InsightDisplay cachedInsight={latest?.insightText ?? null} />
-        {latest && (
-          <p className="mt-3 text-xs text-muted">
-            Last generated from {latest.submissionCount} responses
-            {latest.generationTimeMs
-              ? ` in ${(latest.generationTimeMs / 1000).toFixed(1)}s`
-              : ""}
-          </p>
-        )}
+        <InsightSection
+          cachedInsight={latest?.insightText ?? null}
+          submissionCount={latest?.submissionCount}
+          generationTimeMs={latest?.generationTimeMs}
+        />
       </section>
 
       <section>
