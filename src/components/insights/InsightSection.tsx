@@ -17,18 +17,25 @@ function InsightSectionInner({
 }: InsightSectionProps) {
   const [streamedText, setStreamedText] = useState<string | null>(null);
 
-  const displayText = streamedText !== null ? streamedText : cachedInsight;
-  const showMeta = streamedText === null && submissionCount;
+  const isStreaming = streamedText !== null;
+  const displayText = isStreaming ? streamedText : cachedInsight;
+  const showMeta = !isStreaming && submissionCount;
 
   return (
-    <div className="relative">
-      <div className="absolute right-0 top-0">
+    <div>
+      <div className="mb-2 flex justify-end empty:hidden">
         <Suspense>
           <DemoRegenButton onStream={setStreamedText} />
         </Suspense>
       </div>
 
-      <InsightDisplay cachedInsight={displayText} />
+      {isStreaming && !streamedText ? (
+        <p className="py-8 text-center text-sm text-muted animate-pulse">
+          Generating insight&hellip;
+        </p>
+      ) : (
+        <InsightDisplay cachedInsight={displayText} />
+      )}
 
       {showMeta && (
         <p className="mt-3 text-xs text-muted">
