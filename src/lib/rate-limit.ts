@@ -67,3 +67,9 @@ export const readLimiter = new RateLimiter({
   maxRequests: 30,
   windowMs: 60_000,
 });
+
+/** Form submissions: 3 per 5 minutes per IP */
+export const submitLimiter = new RateLimiter({
+  maxRequests: 3,
+  windowMs: 5 * 60_000,
+});

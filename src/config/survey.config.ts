@@ -228,6 +228,7 @@ Return JSON matching the schema.`,
     insightCooldownMs: 0,
     statisticsCacheTtlMs: 60_000, // 60 seconds
     minSubmissionsForAI: 5,
+    maxSubmissions: 500,
   },
 
   // ─── Seed data (development) ────────────────────────────────

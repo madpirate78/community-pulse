@@ -67,13 +67,31 @@ export function SurveyFlow() {
     doSubmit(fixedAnswers!, adaptiveAnswers);
   }
 
-  function doSubmit(
+  async function doSubmit(
     fixed: Record<string, unknown>,
     adaptive: Record<string, unknown>[] | null
   ) {
     setStage("done");
-    router.push("/thank-you");
-    submitResponse(fixed, adaptive).catch(console.error);
+
+    try {
+      const result = await submitResponse(fixed, adaptive);
+
+      if (result.success) {
+        router.push("/thank-you");
+        return;
+      }
+
+      if (result.error === "rate_limited" || result.error === "submissions_closed") {
+        setBusyMessage(result.message);
+        setStage("fixed");
+        return;
+      }
+    } catch {
+      // Network or unexpected error
+    }
+
+    setBusyMessage("Something went wrong. Please try again.");
+    setStage("fixed");
   }
 
   return (

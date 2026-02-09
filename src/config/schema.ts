@@ -114,6 +114,7 @@ export const surveyConfigSchema = z.object({
     insightCooldownMs: z.number().int().min(0),
     statisticsCacheTtlMs: z.number().int().min(0),
     minSubmissionsForAI: z.number().int().min(1),
+    maxSubmissions: z.number().int().min(1).optional(),
   }),
 
   seedData: z.array(seedEntrySchema).optional(),
