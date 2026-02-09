@@ -81,7 +81,13 @@ export async function moderateContent(
     },
   });
 
-  const result: ModerationResult = JSON.parse(response.text ?? "{}");
+  let result: ModerationResult;
+  try {
+    result = JSON.parse(response.text ?? "{}");
+  } catch {
+    console.error("Failed to parse moderation response:", response.text);
+    throw new Error("Moderation returned invalid JSON");
+  }
   return { safe: result.safe !== false, reason: result.reason };
 }
 

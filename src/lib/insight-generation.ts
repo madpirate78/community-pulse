@@ -1,3 +1,4 @@
+import { ThinkingLevel } from "@google/genai";
 import { getAI, MODELS } from "@/lib/gemini";
 import { buildInsightSystemPrompt, buildInsightUserPrompt } from "@/lib/prompts";
 import {
@@ -69,9 +70,11 @@ export async function generateInsight(): Promise<string | null> {
 
   const response = await getAI().models.generateContent({
     model: MODELS.thinking,
-    contents: [
-      { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
-    ],
+    contents: userPrompt,
+    config: {
+      systemInstruction: systemPrompt,
+      thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+    },
   });
 
   const text = response.candidates?.[0]?.content?.parts?.[0]?.text;

@@ -1,3 +1,4 @@
+import { ThinkingLevel } from "@google/genai";
 import { getAI, MODELS } from "@/lib/gemini";
 import { buildInsightSystemPrompt, buildInsightUserPrompt } from "@/lib/prompts";
 import {
@@ -65,9 +66,11 @@ export async function POST(req: Request) {
       try {
         const response = await getAI().models.generateContentStream({
           model: MODELS.thinking,
-          contents: [
-            { role: "user", parts: [{ text: systemPrompt + "\n\n" + userPrompt }] },
-          ],
+          contents: userPrompt,
+          config: {
+            systemInstruction: systemPrompt,
+            thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+          },
         });
 
         const encoder = new TextEncoder();

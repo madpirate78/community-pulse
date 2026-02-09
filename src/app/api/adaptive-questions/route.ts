@@ -40,7 +40,16 @@ export async function POST(req: Request) {
       },
     });
 
-    const questions: AdaptiveQuestions = JSON.parse(response.text ?? "{}");
+    let questions: AdaptiveQuestions;
+    try {
+      questions = JSON.parse(response.text ?? "{}");
+    } catch {
+      console.error("Failed to parse adaptive questions response:", response.text);
+      return NextResponse.json(
+        { error: "Invalid response from AI model" },
+        { status: 502 }
+      );
+    }
     return NextResponse.json(questions);
   } catch (error) {
     console.error("Adaptive questions error:", error);

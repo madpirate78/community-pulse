@@ -1,3 +1,4 @@
+import { ThinkingLevel } from "@google/genai";
 import { getAI, MODELS } from "@/lib/gemini";
 import { getAllSacrifices, getSubmissionCount, getLatestThemeExtraction } from "@/lib/db-queries";
 import { extractedThemesResponseSchema } from "@/lib/types";
@@ -34,6 +35,7 @@ export async function extractThemes(): Promise<ExtractedTheme[] | null> {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: {
       responseMimeType: "application/json",
+      thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
       responseSchema: {
         type: "object" as const,
         properties: {
@@ -64,7 +66,14 @@ export async function extractThemes(): Promise<ExtractedTheme[] | null> {
     throw new Error("Empty response from theme extraction model");
   }
 
-  const parsed = extractedThemesResponseSchema.parse(JSON.parse(text));
+  let rawJson: unknown;
+  try {
+    rawJson = JSON.parse(text);
+  } catch {
+    console.error("Failed to parse theme extraction response:", text);
+    throw new Error("Theme extraction returned invalid JSON");
+  }
+  const parsed = extractedThemesResponseSchema.parse(rawJson);
 
   await db.insert(extractedThemes).values({
     themes: parsed.themes,
