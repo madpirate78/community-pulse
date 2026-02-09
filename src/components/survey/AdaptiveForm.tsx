@@ -13,9 +13,11 @@ export function AdaptiveForm({
   onSubmit,
 }: AdaptiveFormProps) {
   const [answers, setAnswers] = useState<Record<number, unknown>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsSubmitting(true);
     const result = questions.questions.map((q, i) => ({
       question: q.question_text,
       answer: answers[i] ?? null,
@@ -45,7 +47,7 @@ export function AdaptiveForm({
                   onClick={() =>
                     setAnswers((prev) => ({ ...prev, [i]: opt }))
                   }
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-left text-sm transition-all ${
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-left text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     answers[i] === opt
                       ? "border-accent bg-accent-subtle text-foreground shadow-soft"
                       : "border-border hover:border-border-strong"
@@ -67,7 +69,7 @@ export function AdaptiveForm({
                     onClick={() =>
                       setAnswers((prev) => ({ ...prev, [i]: n }))
                     }
-                    className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm transition-all ${
+                    className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                       answers[i] === n
                         ? "border-accent bg-accent-subtle text-foreground shadow-soft"
                         : "border-border hover:border-border-strong"
@@ -101,9 +103,11 @@ export function AdaptiveForm({
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50"
+        disabled={isSubmitting}
+        aria-busy={isSubmitting}
+        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
-        Submit Your Voice
+        {isSubmitting ? "Submitting\u2026" : "Submit Your Voice"}
       </button>
     </form>
   );

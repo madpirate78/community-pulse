@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -38,7 +39,21 @@ function getBarColor(key: string, index: number): string {
   return CATEGORY_COLORS[key] ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length];
 }
 
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    setMobile(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return mobile;
+}
+
 export function PressureChart({ data }: { data: PressureData[] }) {
+  const isMobile = useIsMobile();
+
   if (data.length === 0) return null;
 
   return (
@@ -53,8 +68,8 @@ export function PressureChart({ data }: { data: PressureData[] }) {
           <YAxis
             type="category"
             dataKey="label"
-            width={160}
-            tick={{ fontSize: 13, fill: "var(--text-muted)" }}
+            width={isMobile ? 100 : 160}
+            tick={{ fontSize: isMobile ? 11 : 13, fill: "var(--text-muted)" }}
           />
           <Tooltip
             formatter={(value) => [`${value} responses`, "Count"]}

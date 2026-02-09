@@ -24,6 +24,7 @@
   --warning-bg: #FFFBEB;
   --warning-border: #FDE68A;
   --warning-text: #92400E;
+  --error-text: #B91C1C;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,6 +48,7 @@
     --warning-bg: rgba(251, 191, 36, 0.1);
     --warning-border: rgba(251, 191, 36, 0.25);
     --warning-text: #FBBF24;
+    --error-text: #FCA5A5;
   }
 }
 

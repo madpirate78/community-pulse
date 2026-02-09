@@ -48,12 +48,18 @@ export default function RootLayout({
       <body
         className={`${instrumentSerif.variable} ${plusJakarta.variable} ${jetbrainsMono.variable} font-body antialiased`}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
+        >
+          Skip to main content
+        </a>
         <nav className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight text-accent">
               {config.branding.appName}
             </Link>
-            <div className="flex gap-5 text-sm font-medium">
+            <div className="flex gap-3 text-xs font-medium sm:gap-5 sm:text-sm">
               <Link
                 href="/submit"
                 className="relative text-muted transition-colors hover:text-foreground"
@@ -77,7 +83,7 @@ export default function RootLayout({
           <div className="h-px bg-gradient-to-r from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] opacity-30" />
         </nav>
         <GrainOverlay />
-        <MotionProvider>{children}</MotionProvider>
+        <MotionProvider><div id="main-content">{children}</div></MotionProvider>
       </body>
     </html>
   );

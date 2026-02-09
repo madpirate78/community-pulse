@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { config } from "@/config";
 import { SurveyFlow } from "@/components/survey/SurveyFlow";
+
+export const metadata: Metadata = { title: "Submit" };
 
 export default function SubmitPage() {
   return (

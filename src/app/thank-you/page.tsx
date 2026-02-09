@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { config } from "@/config";
+
+export const metadata: Metadata = { title: "Thank You" };
 
 export default function ThankYouPage() {
   const { heading, body, ctaInsights, ctaStats } = config.pages.thankYou;

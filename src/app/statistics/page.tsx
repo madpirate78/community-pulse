@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { config } from "@/config";
 import { StatsDashboard } from "@/components/stats/StatsDashboard";
+
+export const metadata: Metadata = { title: "Statistics" };
 
 export default function StatisticsPage() {
   return (

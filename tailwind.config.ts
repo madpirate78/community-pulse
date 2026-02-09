@@ -31,6 +31,7 @@ const config: Config = {
           bg: "var(--warning-bg)",
           border: "var(--warning-border)",
         },
+        error: "var(--error-text)",
       },
       fontFamily: {
         display: ["var(--font-display)", "ui-serif", "Georgia", "serif"],

@@ -17,6 +17,7 @@ export function FixedQuestionsForm({
 }: FixedQuestionsFormProps) {
   const [values, setValues] = useState<Record<string, unknown>>(defaultValues ?? {});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function setValue(fieldName: string, value: unknown) {
     setValues((prev) => ({ ...prev, [fieldName]: value }));
@@ -67,6 +68,7 @@ export function FixedQuestionsForm({
       }
     }
 
+    setIsSubmitting(true);
     onSubmit(cleaned);
   }
 
@@ -84,9 +86,11 @@ export function FixedQuestionsForm({
 
       <button
         type="submit"
-        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50"
+        disabled={isSubmitting}
+        aria-busy={isSubmitting}
+        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
       >
-        Continue
+        {isSubmitting ? "Submitting\u2026" : "Continue"}
       </button>
     </form>
   );
@@ -103,45 +107,57 @@ function QuestionField({
   onChange: (value: unknown) => void;
   error?: string;
 }) {
+  const fieldId = `field-${question.fieldName}`;
+
   return (
     <div>
-      <label className="mb-3 block font-display text-lg font-semibold">
+      <label
+        id={`${fieldId}-label`}
+        htmlFor={question.type === "text" ? fieldId : undefined}
+        className="mb-3 block font-display text-lg font-semibold"
+      >
         {question.label}
       </label>
 
       {question.type === "choice" && (
-        <ChoiceSelector
-          options={question.options}
-          value={(value as string) ?? null}
-          onChange={onChange}
-        />
+        <div role="group" aria-labelledby={`${fieldId}-label`}>
+          <ChoiceSelector
+            options={question.options}
+            value={(value as string) ?? null}
+            onChange={onChange}
+          />
+        </div>
       )}
 
       {question.type === "scale" && (
-        <ScaleSelector
-          min={question.min}
-          max={question.max}
-          labels={Object.fromEntries(
-            Object.entries(question.labels).map(([k, v]) => [Number(k), v])
-          )}
-          value={(value as number) ?? null}
-          onChange={(n) => onChange(n)}
-        />
+        <div role="group" aria-labelledby={`${fieldId}-label`}>
+          <ScaleSelector
+            min={question.min}
+            max={question.max}
+            labels={Object.fromEntries(
+              Object.entries(question.labels).map(([k, v]) => [Number(k), v])
+            )}
+            value={(value as number) ?? null}
+            onChange={(n) => onChange(n)}
+          />
+        </div>
       )}
 
       {question.type === "text" && (
         <>
           <textarea
+            id={fieldId}
             value={(value as string) ?? ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={question.placeholder}
             maxLength={question.maxLength}
             rows={2}
+            aria-describedby={error ? `${fieldId}-error` : undefined}
             className="w-full rounded-lg border-2 border-border bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
           />
           <div className="mt-1 flex justify-between text-xs text-muted">
             {error ? (
-              <span className="text-red-700/80">{error}</span>
+              <span id={`${fieldId}-error`} role="alert" className="text-error">{error}</span>
             ) : (
               <span />
             )}
@@ -153,7 +169,7 @@ function QuestionField({
       )}
 
       {error && question.type !== "text" && (
-        <p className="mt-2 text-sm text-red-700/80">{error}</p>
+        <p id={`${fieldId}-error`} role="alert" className="mt-2 text-sm text-error">{error}</p>
       )}
     </div>
   );
