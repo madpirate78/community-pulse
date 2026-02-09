@@ -26,6 +26,11 @@ const config: Config = {
         },
         border: "var(--border)",
         "border-strong": "var(--border-strong)",
+        warning: {
+          DEFAULT: "var(--warning-text)",
+          bg: "var(--warning-bg)",
+          border: "var(--warning-border)",
+        },
       },
       fontFamily: {
         display: ["var(--font-display)", "ui-serif", "Georgia", "serif"],

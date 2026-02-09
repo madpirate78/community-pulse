@@ -5,7 +5,6 @@ import {
   getDatasetSummary,
   getAllSacrifices,
   getAllAdaptiveData,
-  getPressureCounts,
   getRecentSubmissionCounts,
   getSubmissionCount,
   getLatestInsight,
@@ -15,7 +14,7 @@ import { config } from "@/config";
 import { db } from "@/db";
 import { insightSnapshots } from "@/db/schema";
 
-let insightInProgress = false;
+let inflight: Promise<string | null> | null = null;
 
 export async function shouldGenerateInsight(): Promise<boolean> {
   const [currentCount, latest] = await Promise.all([
@@ -38,18 +37,17 @@ export async function shouldGenerateInsight(): Promise<boolean> {
 export async function generateInsight(): Promise<string | null> {
   const start = Date.now();
 
-  const [summary, sacrifices, adaptiveData, pressureCounts, recent] =
+  const [summary, sacrifices, adaptiveData, recent] =
     await Promise.all([
       getDatasetSummary(),
       getAllSacrifices(),
       getAllAdaptiveData(),
-      getPressureCounts(),
       getRecentSubmissionCounts(),
     ]);
 
   if (summary.total_responses === 0) return null;
 
-  const pressuresRanked = Object.entries(pressureCounts)
+  const pressuresRanked = Object.entries(summary.pressure_counts)
     .sort(([, a], [, b]) => b - a)
     .filter(([, count]) => count > 0)
     .map(
@@ -93,16 +91,16 @@ export async function generateInsight(): Promise<string | null> {
   return text;
 }
 
-export async function maybeGenerateInsight(): Promise<string | null> {
-  if (insightInProgress) return null;
-
-  const needed = await shouldGenerateInsight();
-  if (!needed) return null;
-
-  insightInProgress = true;
-  try {
-    return await generateInsight();
-  } finally {
-    insightInProgress = false;
-  }
+export function maybeGenerateInsight(): Promise<string | null> {
+  if (inflight) return inflight;
+  inflight = (async () => {
+    try {
+      const needed = await shouldGenerateInsight();
+      if (!needed) return null;
+      return await generateInsight();
+    } finally {
+      inflight = null;
+    }
+  })();
+  return inflight;
 }

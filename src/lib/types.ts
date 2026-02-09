@@ -116,6 +116,7 @@ export type ExtractedThemesResponse = z.infer<typeof extractedThemesResponseSche
 
 export interface DatasetSummary {
   total_responses: number;
+  pressure_counts: Record<string, number>;
   top_pressure: string;
   top_pressure_pct: number;
   avg_change: number;

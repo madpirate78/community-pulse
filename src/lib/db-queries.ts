@@ -139,6 +139,7 @@ export async function getDatasetSummary(): Promise<DatasetSummary> {
 
   return {
     total_responses: totalCount,
+    pressure_counts: pressureCounts,
     top_pressure: topPressure,
     top_pressure_pct: topPressurePct,
     avg_change: avgChange,

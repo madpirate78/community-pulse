@@ -3,6 +3,7 @@ import { Instrument_Serif, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/g
 import Link from "next/link";
 import { config } from "@/config";
 import { GrainOverlay } from "@/components/ui/GrainOverlay";
+import { MotionProvider } from "@/components/ui/MotionProvider";
 import "./globals.css";
 
 const instrumentSerif = Instrument_Serif({
@@ -76,7 +77,7 @@ export default function RootLayout({
           <div className="h-px bg-gradient-to-r from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] opacity-30" />
         </nav>
         <GrainOverlay />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  getSubmissionCount,
-  getPressureCounts,
-  getAverageChangeDirection,
-  getDatasetSummary,
-} from "@/lib/db-queries";
+import { getDatasetSummary } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
 import { config } from "@/config";
 import { readLimiter } from "@/lib/rate-limit";
@@ -22,14 +17,12 @@ export async function GET(req: Request) {
     return NextResponse.json(cachedResponse.data);
   }
 
-  const [total, pressureCounts, avgChange, summary] = await Promise.all([
-    getSubmissionCount(),
-    getPressureCounts(),
-    getAverageChangeDirection(),
-    getDatasetSummary(),
-  ]);
+  const summary = await getDatasetSummary();
 
-  const pressures = Object.entries(pressureCounts)
+  const total = summary.total_responses;
+  const avgChange = summary.avg_change;
+
+  const pressures = Object.entries(summary.pressure_counts)
     .map(([key, count]) => ({
       key,
       label: PRESSURE_LABELS[key] ?? key,

@@ -5,35 +5,28 @@ import {
   getDatasetSummary,
   getAllSacrifices,
   getAllAdaptiveData,
-  getPressureCounts,
-  getRecentSubmissionCounts,
+  getRecentSubmissionCounts
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
 import { aiLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
+import { MAX_RETRIES, RETRY_DELAYS, sleep, isRetryableStatus } from "@/lib/retry";
+import { log } from "@/lib/logger";
 import { db } from "@/db";
 import { insightSnapshots } from "@/db/schema";
 
 export const dynamic = "force-dynamic";
-
-const MAX_RETRIES = 3;
-const RETRY_DELAYS = [5_000, 15_000, 30_000];
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export async function POST(req: Request) {
   const blocked = applyRateLimit(req, aiLimiter);
   if (blocked) return blocked;
   const start = Date.now();
   try {
-    const [summary, sacrifices, adaptiveData, pressureCounts, recent] =
+    const [summary, sacrifices, adaptiveData, recent] =
       await Promise.all([
         getDatasetSummary(),
         getAllSacrifices(),
         getAllAdaptiveData(),
-        getPressureCounts(),
         getRecentSubmissionCounts(),
       ]);
 
@@ -41,7 +34,7 @@ export async function POST(req: Request) {
       return new Response("No submissions yet.", { status: 200 });
     }
 
-    const pressuresRanked = Object.entries(pressureCounts)
+    const pressuresRanked = Object.entries(summary.pressure_counts)
       .sort(([, a], [, b]) => b - a)
       .filter(([, count]) => count > 0)
       .map(
@@ -97,7 +90,7 @@ export async function POST(req: Request) {
                     generationTimeMs: Date.now() - start,
                   });
                 } catch (err) {
-                  console.error("Failed to persist insight snapshot:", err);
+                  log.error("Failed to persist insight snapshot:", err);
                 }
               }
             }
@@ -110,9 +103,9 @@ export async function POST(req: Request) {
       } catch (error: unknown) {
         lastError = error;
         const status = (error as { status?: number }).status;
-        if ((status === 503 || status === 429) && attempt < MAX_RETRIES) {
+        if (isRetryableStatus(status) && attempt < MAX_RETRIES) {
           const delay = RETRY_DELAYS[attempt];
-          console.log(`Model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
+          log.info(`Model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})`);
           await sleep(delay);
           continue;
         }
@@ -122,9 +115,9 @@ export async function POST(req: Request) {
 
     throw lastError;
   } catch (error) {
-    console.error("Insight generation error:", error);
+    log.error("Insight generation error:", error);
     const status = (error as { status?: number }).status;
-    if (status === 503 || status === 429) {
+    if (isRetryableStatus(status)) {
       return new Response("Model is busy — please try again in a minute.", {
         status: 503,
       });

@@ -2,6 +2,8 @@ import { ThinkingLevel } from "@google/genai";
 import { eq } from "drizzle-orm";
 import { getAI, MODELS } from "@/lib/gemini";
 import { renderPrompt } from "@/lib/prompt-renderer";
+import { RETRY_DELAYS } from "@/lib/retry";
+import { log } from "@/lib/logger";
 import { config } from "@/config";
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
@@ -85,13 +87,11 @@ export async function moderateContent(
   try {
     result = JSON.parse(response.text ?? "{}");
   } catch {
-    console.error("Failed to parse moderation response:", response.text);
+    log.error("Failed to parse moderation response:", response.text);
     throw new Error("Moderation returned invalid JSON");
   }
   return { safe: result.safe !== false, reason: result.reason };
 }
-
-const RETRY_DELAYS = [5_000, 15_000, 30_000];
 
 /**
  * Background retry for moderation after an API error.
@@ -115,19 +115,17 @@ export async function retryModeration(
         .set({ contentSafe: result.safe })
         .where(eq(submissions.id, submissionId));
 
-      console.log(
-        `Retry moderation ${result.safe ? "passed" : "failed"} for ${submissionId} (attempt ${attempt + 1})`
+      log.info(
+        `Retry moderation ${result.safe ? "passed" : "failed"} (attempt ${attempt + 1})`
       );
       return;
     } catch (error) {
-      console.warn(
-        `Retry moderation attempt ${attempt + 1}/${RETRY_DELAYS.length} failed for ${submissionId}:`,
+      log.warn(
+        `Retry moderation attempt ${attempt + 1}/${RETRY_DELAYS.length} failed`,
         error
       );
     }
   }
 
-  console.error(
-    `Retry moderation exhausted for ${submissionId} — row stays unmoderated`
-  );
+  log.error("Retry moderation exhausted — row stays unmoderated");
 }

@@ -1,16 +1,11 @@
 import { extractThemes } from "@/lib/theme-extraction";
 import { aiLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
+import { MAX_RETRIES, RETRY_DELAYS, sleep, isRetryableStatus } from "@/lib/retry";
+import { log } from "@/lib/logger";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-
-const MAX_RETRIES = 3;
-const RETRY_DELAYS = [5_000, 15_000, 30_000];
-
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 export async function POST(req: Request) {
   const blocked = applyRateLimit(req, aiLimiter);
@@ -32,9 +27,9 @@ export async function POST(req: Request) {
     } catch (error: unknown) {
       lastError = error;
       const status = (error as { status?: number }).status;
-      if ((status === 503 || status === 429) && attempt < MAX_RETRIES) {
+      if (isRetryableStatus(status) && attempt < MAX_RETRIES) {
         const delay = RETRY_DELAYS[attempt];
-        console.log(
+        log.info(
           `Theme extraction model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})`
         );
         await sleep(delay);
@@ -44,9 +39,9 @@ export async function POST(req: Request) {
     }
   }
 
-  console.error("Theme extraction error:", lastError);
+  log.error("Theme extraction error:", lastError);
   const status = (lastError as { status?: number }).status;
-  if (status === 503 || status === 429) {
+  if (isRetryableStatus(status)) {
     return NextResponse.json(
       { error: "Model is busy — please try again in a minute." },
       { status: 503 }

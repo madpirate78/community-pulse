@@ -8,6 +8,7 @@ import { getDatasetSummary } from "@/lib/db-queries";
 import type { AdaptiveQuestions } from "@/lib/types";
 import { aiLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
+import { log } from "@/lib/logger";
 
 export async function POST(req: Request) {
   const blocked = applyRateLimit(req, aiLimiter);
@@ -44,7 +45,7 @@ export async function POST(req: Request) {
     try {
       questions = JSON.parse(response.text ?? "{}");
     } catch {
-      console.error("Failed to parse adaptive questions response:", response.text);
+      log.error("Failed to parse adaptive questions response:", response.text);
       return NextResponse.json(
         { error: "Invalid response from AI model" },
         { status: 502 }
@@ -52,7 +53,7 @@ export async function POST(req: Request) {
     }
     return NextResponse.json(questions);
   } catch (error) {
-    console.error("Adaptive questions error:", error);
+    log.error("Adaptive questions error:", error);
     return NextResponse.json(
       { error: "Failed to generate questions" },
       { status: 500 }

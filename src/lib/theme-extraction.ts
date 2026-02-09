@@ -5,10 +5,11 @@ import { extractedThemesResponseSchema } from "@/lib/types";
 import type { ExtractedTheme } from "@/lib/types";
 import { config } from "@/config";
 import { renderPrompt } from "@/lib/prompt-renderer";
+import { log } from "@/lib/logger";
 import { db } from "@/db";
 import { extractedThemes } from "@/db/schema";
 
-let extractionInProgress = false;
+let inflight: Promise<ExtractedTheme[] | null> | null = null;
 
 function buildThemeExtractionPrompt(sacrifices: string[]): string {
   return renderPrompt(config.prompts.themeExtraction, {
@@ -70,7 +71,7 @@ export async function extractThemes(): Promise<ExtractedTheme[] | null> {
   try {
     rawJson = JSON.parse(text);
   } catch {
-    console.error("Failed to parse theme extraction response:", text);
+    log.error("Failed to parse theme extraction response:", text);
     throw new Error("Theme extraction returned invalid JSON");
   }
   const parsed = extractedThemesResponseSchema.parse(rawJson);
@@ -96,16 +97,16 @@ export async function shouldExtract(): Promise<boolean> {
   return currentCount - latest.submissionCount >= config.operational.themeExtractionInterval;
 }
 
-export async function maybeExtractThemes(): Promise<ExtractedTheme[] | null> {
-  if (extractionInProgress) return null;
-
-  const needed = await shouldExtract();
-  if (!needed) return null;
-
-  extractionInProgress = true;
-  try {
-    return await extractThemes();
-  } finally {
-    extractionInProgress = false;
-  }
+export function maybeExtractThemes(): Promise<ExtractedTheme[] | null> {
+  if (inflight) return inflight;
+  inflight = (async () => {
+    try {
+      const needed = await shouldExtract();
+      if (!needed) return null;
+      return await extractThemes();
+    } finally {
+      inflight = null;
+    }
+  })();
+  return inflight;
 }

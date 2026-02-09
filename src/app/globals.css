@@ -21,6 +21,9 @@
   --gradient-end: #0D9488;
   --border: #E7E5E4;
   --border-strong: #D6D3D1;
+  --warning-bg: #FFFBEB;
+  --warning-border: #FDE68A;
+  --warning-text: #92400E;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -41,6 +44,9 @@
     --gradient-end: #2DD4BF;
     --border: #292524;
     --border-strong: #44403C;
+    --warning-bg: rgba(251, 191, 36, 0.1);
+    --warning-border: rgba(251, 191, 36, 0.25);
+    --warning-text: #FBBF24;
   }
 }
 

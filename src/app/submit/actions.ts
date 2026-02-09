@@ -10,6 +10,7 @@ import { maybeExtractThemes } from "@/lib/theme-extraction";
 import { maybeGenerateInsight } from "@/lib/insight-generation";
 import { submitLimiter } from "@/lib/rate-limit";
 import { getSubmissionCount } from "@/lib/db-queries";
+import { log } from "@/lib/logger";
 
 export async function submitResponse(
   fixedAnswers: unknown,
@@ -80,7 +81,7 @@ export async function submitResponse(
     .returning({ id: submissions.id });
 
   if (contentSafe === null) {
-    console.warn(`Moderation API error — submission ${inserted.id} stored with contentSafe=null, retrying in background`);
+    log.warn("Moderation API error — submission stored with contentSafe=null, retrying in background");
     retryModeration(inserted.id, freeTexts).catch(console.error);
   }
 

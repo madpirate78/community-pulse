@@ -42,22 +42,19 @@ function createDb() {
     );
   `);
 
-  // Migrate: add columns that CREATE TABLE IF NOT EXISTS won't add to existing tables.
-  // SQLite has no ADD COLUMN IF NOT EXISTS, so catch the duplicate column error.
-  const migrations = [
-    `ALTER TABLE submissions ADD COLUMN content_safe INTEGER`,
-  ];
-  for (const sql of migrations) {
-    try {
-      sqlite.exec(sql);
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message.includes("duplicate column")) continue;
-      throw e;
-    }
+  // Migrate: add content_safe column.
+  // Backfill only runs when the column is first added — the only time NULL rows
+  // are genuinely legacy data without a moderation status.
+  try {
+    sqlite.exec(`ALTER TABLE submissions ADD COLUMN content_safe INTEGER`);
+    sqlite.exec(`UPDATE submissions SET content_safe = 1 WHERE content_safe IS NULL`);
+  } catch (e: unknown) {
+    if (!(e instanceof Error && e.message.includes("duplicate column"))) throw e;
   }
 
-  // Backfill: mark any existing rows without a content_safe value as safe
-  sqlite.exec(`UPDATE submissions SET content_safe = 1 WHERE content_safe IS NULL`);
+  // Indexes for common query patterns
+  sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_consent_safe ON submissions(consent_given, content_safe)`);
+  sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_created_at ON submissions(created_at)`);
 
   return drizzle(sqlite, { schema });
 }
