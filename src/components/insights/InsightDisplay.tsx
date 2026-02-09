@@ -1,3 +1,4 @@
+import Markdown from "react-markdown";
 import { config } from "@/config";
 
 interface InsightDisplayProps {
@@ -17,10 +18,8 @@ export function InsightDisplay({ cachedInsight }: InsightDisplayProps) {
   }
 
   return (
-    <div className="max-w-none space-y-3 leading-relaxed text-foreground">
-      {cachedInsight.split("\n").map((line, i) => (
-        <p key={i}>{line}</p>
-      ))}
+    <div className="prose prose-neutral dark:prose-invert max-w-none leading-relaxed text-foreground">
+      <Markdown>{cachedInsight}</Markdown>
     </div>
   );
 }
