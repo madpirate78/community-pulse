@@ -34,7 +34,7 @@ export function InsightPreview({ insightText }: InsightPreviewProps) {
           &ldquo;
         </span>
         <span className="relative block border-l-4 border-transparent pl-4 font-display" style={{ borderImage: "linear-gradient(to bottom, var(--gradient-start), var(--gradient-end)) 1" }}>
-          <div className="prose prose-sm dark:prose-invert"><Markdown>{preview}</Markdown></div>
+          <div className="prose prose-sm max-w-none dark:prose-invert"><Markdown>{preview}</Markdown></div>
         </span>
       </blockquote>
       <div className="mt-3 text-center">
