@@ -77,8 +77,9 @@ export function PressureChart({ data }: { data: PressureData[] }) {
               background: "var(--bg-surface)",
               border: "1px solid var(--border)",
               borderRadius: "8px",
-              color: "var(--text)",
             }}
+            itemStyle={{ color: "var(--text)" }}
+            labelStyle={{ color: "var(--text-muted)" }}
           />
           <Bar dataKey="count" radius={[0, 6, 6, 0]}>
             {data.map((entry, i) => (

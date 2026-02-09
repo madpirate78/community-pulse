@@ -4,7 +4,6 @@ import { getLatestInsight } from "@/lib/db-queries";
 
 export const metadata: Metadata = { title: "Insights" };
 import { InsightDisplay } from "@/components/insights/InsightDisplay";
-import { StatsDashboard } from "@/components/stats/StatsDashboard";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +30,6 @@ export default async function InsightsPage() {
               : ""}
           </p>
         )}
-      </section>
-
-      <section>
-        <h2 className="mb-4 font-display text-2xl font-bold">Statistics</h2>
-        <StatsDashboard />
       </section>
     </main>
   );
