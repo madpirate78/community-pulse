@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Markdown from "react-markdown";
 import { motion } from "framer-motion";
 import { pages } from "@/config/client";
 
@@ -28,12 +29,12 @@ export function InsightPreview({ insightText }: InsightPreviewProps) {
       </h2>
       <blockquote className="relative overflow-hidden rounded-xl border border-border bg-surface p-6 text-muted italic shadow-soft">
         <span
-          className="absolute left-2 top-1 bg-gradient-to-br from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] bg-clip-text font-display text-6xl leading-none text-transparent opacity-20"
+          className="absolute left-3 top-2 bg-gradient-to-br from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] bg-clip-text font-display text-6xl leading-none text-transparent opacity-30"
         >
           &ldquo;
         </span>
         <span className="relative block border-l-4 border-transparent pl-4 font-display" style={{ borderImage: "linear-gradient(to bottom, var(--gradient-start), var(--gradient-end)) 1" }}>
-          {preview}
+          <div className="prose prose-sm dark:prose-invert"><Markdown>{preview}</Markdown></div>
         </span>
       </blockquote>
       <div className="mt-3 text-center">
