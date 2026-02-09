@@ -13,7 +13,7 @@
     "@google/genai": "^1.40.0",
     "better-sqlite3": "^12.6.2",
     "drizzle-orm": "^0.45.1",
-    "framer-motion": "^12.33.0",
+    "framer-motion": "^12.34.0",
     "next": "14.2.35",
     "react": "^18",
     "react-dom": "^18",
@@ -21,12 +21,15 @@
     "zod": "3",
     "zod-to-json-schema": "3"
   },
+  "overrides": {
+    "glob": ">=10.5.0"
+  },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "drizzle-kit": "^0.31.8",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^8",
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
