@@ -1,4 +1,5 @@
 import { ThinkingLevel } from "@google/genai";
+import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { getAI, MODELS } from "@/lib/gemini";
 import { renderPrompt } from "@/lib/prompt-renderer";
@@ -8,10 +9,12 @@ import { config } from "@/config";
 import { db } from "@/db";
 import { submissions } from "@/db/schema";
 
-export interface ModerationResult {
-  safe: boolean;
-  reason?: string;
-}
+const moderationResultSchema = z.object({
+  safe: z.boolean(),
+  reason: z.string().optional(),
+});
+
+export type ModerationResult = z.infer<typeof moderationResultSchema>;
 
 /**
  * Extract free-text strings from fixed answers and adaptive data.
@@ -52,7 +55,9 @@ export function collectFreeText(
 
 /**
  * Run content moderation on free-text submissions via Gemini Flash.
- * Throws on API/network errors — caller decides how to handle.
+ * Throws on API/network errors or a malformed model response — the
+ * caller stores the submission unmoderated and retries in the
+ * background (store-and-gate).
  */
 export async function moderateContent(
   texts: string[]
@@ -83,14 +88,12 @@ export async function moderateContent(
     },
   });
 
-  let result: ModerationResult;
   try {
-    result = JSON.parse(response.text ?? "{}");
+    return moderationResultSchema.parse(JSON.parse(response.text ?? ""));
   } catch {
     log.error("Failed to parse moderation response:", response.text);
-    throw new Error("Moderation returned invalid JSON");
+    throw new Error("Moderation returned an invalid response");
   }
-  return { safe: result.safe !== false, reason: result.reason };
 }
 
 /**

@@ -11,11 +11,16 @@ import { EmptyState } from "@/components/ui/EmptyState";
 export function StatsDashboard() {
   const [data, setData] = useState<StatisticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     fetch("/api/statistics")
-      .then((r) => r.json())
-      .then((d) => setData(d))
+      .then((res) => {
+        if (!res.ok) throw new Error(`Statistics request failed (${res.status})`);
+        return res.json();
+      })
+      .then((d: StatisticsResponse) => setData(d))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -25,6 +30,15 @@ export function StatsDashboard() {
         <div className="h-10 rounded-xl bg-border" />
         <div className="h-72 rounded-xl bg-border" />
       </div>
+    );
+  }
+
+  if (failed) {
+    return (
+      <EmptyState
+        heading={pages.statistics.errorHeading}
+        body={pages.statistics.errorBody}
+      />
     );
   }
 

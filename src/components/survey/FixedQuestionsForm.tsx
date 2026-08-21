@@ -62,14 +62,13 @@ export function FixedQuestionsForm({
       return;
     }
 
-    // Trim text values before submitting
+    // Trim text values before submitting; an optional untouched text
+    // question has no value yet, so fall back to an empty string.
     const cleaned: Record<string, unknown> = {};
     for (const q of questions.fixed) {
-      if (q.type === "text") {
-        cleaned[q.fieldName] = (values[q.fieldName] as string).trim();
-      } else {
-        cleaned[q.fieldName] = values[q.fieldName];
-      }
+      const val = values[q.fieldName];
+      cleaned[q.fieldName] =
+        q.type === "text" ? (typeof val === "string" ? val.trim() : "") : val;
     }
 
     setIsSubmitting(true);

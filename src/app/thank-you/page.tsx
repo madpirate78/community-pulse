@@ -8,7 +8,7 @@ export default function ThankYouPage() {
   const { heading, body, ctaInsights, ctaStats } = config.pages.thankYou;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+    <main className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       <div className="mx-auto max-w-md animate-fade-in">
         <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent-subtle">
           <div className="h-4 w-4 animate-glow-pulse rounded-full bg-accent" />

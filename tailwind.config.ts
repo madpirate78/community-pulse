@@ -8,7 +8,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "var(--bg)",
+        canvas: {
+          DEFAULT: "var(--bg)",
+          translucent: "var(--bg-translucent)",
+        },
         surface: "var(--bg-surface)",
         foreground: "var(--text)",
         muted: "var(--text-muted)",
@@ -16,6 +19,7 @@ const config: Config = {
           DEFAULT: "var(--accent)",
           hover: "var(--accent-hover)",
           subtle: "var(--accent-subtle)",
+          soft: "var(--accent-soft)",
           glow: "var(--accent-glow)",
         },
         border: "var(--border)",

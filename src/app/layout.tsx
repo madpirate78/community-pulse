@@ -54,7 +54,7 @@ export default function RootLayout({
         >
           {config.ui.skipLink}
         </a>
-        <nav className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-md">
+        <nav className="sticky top-0 z-40 bg-canvas-translucent backdrop-blur-md">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight text-accent">
               {config.branding.appName}
@@ -83,7 +83,7 @@ export default function RootLayout({
           <div className="h-px bg-gradient-to-r from-[var(--gradient-start)] via-[var(--gradient-mid)] to-[var(--gradient-end)] opacity-30" />
         </nav>
         <GrainOverlay />
-        <MotionProvider><div id="main-content">{children}</div></MotionProvider>
+        <MotionProvider><div id="main-content" tabIndex={-1}>{children}</div></MotionProvider>
       </body>
     </html>
   );

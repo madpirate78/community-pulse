@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
+import { adaptiveQuestionSchema } from "@/lib/types";
 import type { AdaptiveQuestions } from "@/lib/types";
 import { FixedQuestionsForm } from "./FixedQuestionsForm";
 import { ShimmerLoader } from "./ShimmerLoader";
@@ -39,20 +40,19 @@ export function SurveyFlow() {
         body: JSON.stringify(answers),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.questions?.length > 0) {
-          setAdaptiveQuestions(data);
-          setStage("adaptive");
-          return;
-        }
-      }
-
       if (!res.ok) {
         setBusyMessage(ui.errors.busy);
         setStage("fixed");
         return;
       }
+
+      const parsed = adaptiveQuestionSchema.safeParse(await res.json());
+      if (parsed.success && parsed.data.questions.length > 0) {
+        setAdaptiveQuestions(parsed.data);
+        setStage("adaptive");
+        return;
+      }
+      // No valid follow-ups — submit the fixed answers on their own.
     } catch {
       setBusyMessage(ui.errors.busy);
       setStage("fixed");
@@ -65,7 +65,8 @@ export function SurveyFlow() {
   function handleAdaptiveSubmit(
     adaptiveAnswers: Record<string, unknown>[]
   ) {
-    doSubmit(fixedAnswers!, adaptiveAnswers);
+    if (!fixedAnswers) return;
+    doSubmit(fixedAnswers, adaptiveAnswers);
   }
 
   async function doSubmit(
@@ -103,6 +104,17 @@ export function SurveyFlow() {
         </motion.div>
       )}
 
+      {stage === "done" && (
+        <motion.div key="done" {...stageMotion}>
+          <p
+            role="status"
+            className="animate-pulse py-12 text-center text-lg font-medium text-muted"
+          >
+            {ui.survey.submittingMessage}
+          </p>
+        </motion.div>
+      )}
+
       {stage === "adaptive" && adaptiveQuestions && (
         <motion.div key="adaptive" {...stageMotion}>
           <AdaptiveForm
@@ -115,7 +127,10 @@ export function SurveyFlow() {
       {stage === "fixed" && (
         <motion.div key="fixed" {...stageMotion}>
           {busyMessage && (
-            <div className="mb-4 rounded-lg border border-warning-border bg-warning-bg px-4 py-3 text-sm text-warning">
+            <div
+              role="alert"
+              className="mb-4 rounded-lg border border-warning-border bg-warning-bg px-4 py-3 text-sm text-warning"
+            >
               {busyMessage}
             </div>
           )}
