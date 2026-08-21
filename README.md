@@ -4,7 +4,7 @@ Anonymous community feedback powered by AI-generated insights.
 
 ## Project status
 
-This repo is the original hackathon build (working name *Dyadem*), written up [on dev.to](https://dev.to/adamp78/i-built-surveys-that-get-smarter-with-every-response-1l1).
+This repo is the original hackathon build (working name *Dyadem*), written up [on dev.to](https://dev.to/adamp78/i-built-surveys-that-get-smarter-with-every-response-1l1) (the article describes the later Postgres-backed version; this repo uses SQLite).
 The production system at [communitypulse.org.uk](https://communitypulse.org.uk) grew out of it and is closed-source as a commercial product. Findings from its 51-respondent field deployment are written up [here](https://adampio.dev/blog/when-community-feedback-contradicts-itself).
 
 
@@ -29,6 +29,8 @@ Community Pulse collects anonymous survey responses, uses Gemini to generate per
 - **Tailwind CSS** + **Framer Motion**
 - **Recharts** for data visualisation
 
+The app ships with a full security-header suite (CSP, HSTS, X-Frame-Options, Referrer-Policy, Permissions-Policy) configured in `next.config.mjs`, plus per-IP rate limiting on all API routes and the submit action.
+
 ## Getting Started
 
 ```bash
@@ -39,17 +41,27 @@ bun install
 cp .env.example .env.local
 # Edit .env.local with your key from https://aistudio.google.com/apikey
 
-# Push the database schema
-npx drizzle-kit push
-
 # Seed with sample data (optional)
-npx tsx scripts/seed.ts
+bun run seed
 
 # Start the dev server
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). The SQLite database and its tables are created automatically on first run — no migration step needed.
+
+### Development
+
+| Command | What it does |
+|---------|--------------|
+| `bun run dev` | Start the dev server |
+| `bun run build` | Production build |
+| `bun run lint` | ESLint via `next lint` |
+| `bun run typecheck` | TypeScript check (`tsc --noEmit`) |
+| `bun test` | Run the test suite |
+| `bun run seed` | Seed the database with the sample data from the config |
+
+All checks run in CI on every push.
 
 ## Customisation
 
@@ -94,35 +106,47 @@ src/
 │   ├── schema.ts             # Zod schema for SurveyConfig type
 │   ├── survey.config.ts      # All domain-specific content (edit this)
 │   ├── index.ts              # Parse-once singleton
-│   └── client.ts             # Client-safe subset (branding, pages, questions)
+│   └── client.ts             # Convenience subset for client components
 ├── app/
 │   ├── page.tsx              # Landing page
 │   ├── submit/               # Survey form + server action
 │   ├── statistics/           # Charts dashboard
 │   ├── insights/             # AI-generated narrative
 │   ├── thank-you/            # Post-submission
+│   ├── error.tsx             # Route error boundary
+│   ├── not-found.tsx         # Custom 404
+│   ├── loading.tsx           # Route-level loading states
 │   └── api/
 │       ├── statistics/       # GET aggregated stats
 │       ├── adaptive-questions/ # POST → Gemini Flash
 │       ├── generate-insight/ # POST → Gemini Pro (streaming)
-│       └── extract-themes/   # POST → theme discovery
+│       ├── extract-themes/   # POST → theme discovery
+│       └── health/           # GET liveness check
 ├── components/
 │   ├── survey/               # Data-driven form components
 │   ├── stats/                # Chart + stats bar
 │   ├── insights/             # Insight display
-│   └── landing/              # Hero, insight preview
+│   ├── landing/              # Hero, insight preview
+│   └── ui/                   # Shared primitives (empty state, motion, grain)
 ├── db/
 │   ├── schema.ts             # Drizzle schema
 │   └── index.ts              # DB client singleton
-└── lib/
-    ├── types.ts              # Dynamic Zod schemas built from config
-    ├── prompts.ts            # AI prompt builders using renderPrompt()
-    ├── prompt-renderer.ts    # {{key}} template replacement
-    ├── db-queries.ts         # Query helpers (parameterised field names)
-    ├── moderation.ts         # Content screening (free-text fields)
-    ├── theme-extraction.ts   # Automatic theme discovery
-    ├── insight-generation.ts # Narrative generation with cooldowns
-    └── gemini.ts             # Gemini client singleton
+├── lib/
+│   ├── types.ts              # Dynamic Zod schemas built from config
+│   ├── prompts.ts            # AI prompt builders using renderPrompt()
+│   ├── prompt-renderer.ts    # {{key}} template replacement
+│   ├── db-queries.ts         # Query helpers (parameterised field names)
+│   ├── moderation.ts         # Content screening (free-text fields)
+│   ├── theme-extraction.ts   # Automatic theme discovery
+│   ├── insight-generation.ts # Narrative generation with cooldowns
+│   ├── rate-limit.ts         # In-memory sliding-window rate limiter
+│   ├── retry.ts              # Shared retry-with-backoff for AI calls
+│   ├── api-utils.ts          # Client IP + rate-limit guard helpers
+│   ├── logger.ts             # Minimal structured logger
+│   └── gemini.ts             # Gemini client singleton
+└── __tests__/                # Unit tests (bun test)
+scripts/
+└── seed.ts                   # Seed the DB from config.seedData
 ```
 
 ## How Gemini Is Used

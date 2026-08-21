@@ -2,9 +2,8 @@ import type { Config } from "drizzle-kit";
 
 export default {
   schema: "./src/db/schema.ts",
-  out: "./src/db/migrations",
   dialect: "sqlite",
   dbCredentials: {
-    url: "community-pulse.db",
+    url: process.env.DB_PATH || "community-pulse.db",
   },
 } satisfies Config;
