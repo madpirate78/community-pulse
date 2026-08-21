@@ -21,19 +21,20 @@ export function isRetryableStatus(status: unknown): boolean {
  */
 export async function withRetry<T>(
   fn: () => Promise<T>,
-  label: string
+  label: string,
+  delays: readonly number[] = RETRY_DELAYS
 ): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
       return await fn();
     } catch (error: unknown) {
       const status = (error as { status?: number }).status;
-      if (!isRetryableStatus(status) || attempt >= RETRY_DELAYS.length) {
+      if (!isRetryableStatus(status) || attempt >= delays.length) {
         throw error;
       }
-      const delay = RETRY_DELAYS[attempt];
+      const delay = delays[attempt];
       log.info(
-        `${label}: model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${RETRY_DELAYS.length})`
+        `${label}: model busy (${status}), retrying in ${delay / 1000}s (attempt ${attempt + 1}/${delays.length})`
       );
       await sleep(delay);
     }
