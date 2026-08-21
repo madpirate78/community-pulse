@@ -2,6 +2,7 @@ import { getDatasetSummary, getLatestInsight } from "@/lib/db-queries";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { InsightPreview } from "@/components/landing/InsightPreview";
 import { StatsBar } from "@/components/stats/StatsBar";
+
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
@@ -12,7 +13,6 @@ export default async function Home() {
 
   return (
     <main className="relative mx-auto max-w-4xl px-4">
-
       <HeroSection />
 
       {summary.total_responses > 0 && (

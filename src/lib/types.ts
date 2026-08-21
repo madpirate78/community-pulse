@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { config } from "@/config";
-import type { ChoiceQuestion, ScaleQuestion } from "@/config/schema";
+import type { ChoiceQuestion } from "@/config/schema";
 
 // ─── Dynamic fixed-questions schema from config ─────────────
 
@@ -20,7 +20,7 @@ function buildFixedSchema() {
       case "text":
         shape[q.fieldName] = z
           .string()
-          .min(q.minLength, `Please share at least a brief answer`)
+          .min(q.minLength, "Please share at least a brief answer")
           .max(q.maxLength, `Please keep this brief — under ${q.maxLength} characters`);
         break;
     }
@@ -32,34 +32,20 @@ function buildFixedSchema() {
 export const fixedQuestionsSchema = buildFixedSchema();
 export type FixedAnswers = z.infer<typeof fixedQuestionsSchema>;
 
-// ─── Config-derived helpers (backward-compat) ───────────────
+// ─── Config-derived helpers ─────────────────────────────────
 
-function findQuestion<T extends "choice" | "scale" | "text">(type: T) {
-  return config.questions.fixed.filter((q) => q.type === type);
-}
+// The first choice question drives the statistics dashboard and AI prompts.
+const firstChoice = config.questions.fixed.find(
+  (q): q is ChoiceQuestion => q.type === "choice"
+);
 
-const choiceQuestions = findQuestion("choice") as ChoiceQuestion[];
-const scaleQuestions = findQuestion("scale") as ScaleQuestion[];
+/** Option values of the first choice question. */
+export const PRESSURE_OPTIONS: readonly string[] =
+  firstChoice?.options.map((o) => o.value) ?? [];
 
-// First choice question's option values (was PRESSURE_OPTIONS)
-const firstChoice = choiceQuestions[0];
-export const PRESSURE_OPTIONS = firstChoice
-  ? (firstChoice.options.map((o) => o.value) as readonly string[])
-  : ([] as readonly string[]);
-
-export type PressureOption = string;
-
-// First choice question's value→label map (was PRESSURE_LABELS)
+/** Value→label map of the first choice question. */
 export const PRESSURE_LABELS: Record<string, string> = firstChoice
   ? Object.fromEntries(firstChoice.options.map((o) => [o.value, o.label]))
-  : {};
-
-// First scale question's number→label map (was CHANGE_LABELS)
-const firstScale = scaleQuestions[0];
-export const CHANGE_LABELS: Record<number, string> = firstScale
-  ? Object.fromEntries(
-      Object.entries(firstScale.labels).map(([k, v]) => [Number(k), v])
-    )
   : {};
 
 // ─── Adaptive Questions (AI-generated follow-ups) ───────────
@@ -94,7 +80,6 @@ export const adaptiveResponseSchema = z
   )
   .max(2);
 
-export type AdaptiveResponse = z.infer<typeof adaptiveResponseSchema>;
 
 // ─── AI-Extracted Themes ─────────────────────────────────────
 
@@ -110,7 +95,6 @@ export const extractedThemesResponseSchema = z.object({
 });
 
 export type ExtractedTheme = z.infer<typeof extractedThemeSchema>;
-export type ExtractedThemesResponse = z.infer<typeof extractedThemesResponseSchema>;
 
 // ─── Dataset Summary (fed into AI prompts) ────────────────────
 

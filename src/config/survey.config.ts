@@ -4,7 +4,6 @@ const config: SurveyConfig = {
   // ─── Branding ───────────────────────────────────────────────
   branding: {
     appName: "Community Pulse",
-    tagline: "The cost of living is changing how we live.",
     metaDescription:
       "Anonymous community feedback on the cost of living, powered by AI-generated insights.",
     ogDescription:

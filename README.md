@@ -71,7 +71,7 @@ The config has these sections:
 
 | Section | What it controls |
 |---------|-----------------|
-| `branding` | App name, tagline, meta descriptions |
+| `branding` | App name, meta descriptions |
 | `pages` | All page copy (hero, submit, thank-you, statistics, insights) |
 | `questions.fixed` | Survey questions — typed as `choice`, `scale`, or `text` |
 | `prompts` | AI prompt templates with `{{variable}}` markers |

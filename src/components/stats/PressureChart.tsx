@@ -18,7 +18,8 @@ interface PressureData {
   pct: number;
 }
 
-// Match particle field category colors for visual consistency
+// Fixed palette for the default survey categories; unknown keys
+// (from a customised config) cycle through the fallback palette.
 const CATEGORY_COLORS: Record<string, string> = {
   housing:    "#E11D48",  // rose-600
   food:       "#D97706",  // amber-600

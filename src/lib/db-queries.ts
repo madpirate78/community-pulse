@@ -2,7 +2,7 @@ import { db } from "@/db";
 import { submissions, insightSnapshots, extractedThemes } from "@/db/schema";
 import { count, desc, sql, eq, and } from "drizzle-orm";
 import { config } from "@/config";
-import type { DatasetSummary, ExtractedTheme, PressureOption } from "./types";
+import type { DatasetSummary, ExtractedTheme } from "./types";
 import { PRESSURE_OPTIONS } from "./types";
 
 // Derive field names from config questions
@@ -18,19 +18,7 @@ export async function getSubmissionCount(): Promise<number> {
   return row?.total ?? 0;
 }
 
-export async function getAllSubmissions(limit = 100, offset = 0) {
-  return db
-    .select()
-    .from(submissions)
-    .where(eq(submissions.consentGiven, true))
-    .orderBy(desc(submissions.createdAt))
-    .limit(limit)
-    .offset(offset);
-}
-
-export async function getPressureCounts(): Promise<
-  Record<PressureOption, number>
-> {
+export async function getPressureCounts(): Promise<Record<string, number>> {
   const rows = await db
     .select({
       pressure: sql<string>`json_extract(${submissions.responses}, '$.' || ${choiceField})`,
@@ -40,13 +28,13 @@ export async function getPressureCounts(): Promise<
     .where(eq(submissions.consentGiven, true))
     .groupBy(sql`json_extract(${submissions.responses}, '$.' || ${choiceField})`);
 
-  const counts = Object.fromEntries(
+  const counts: Record<string, number> = Object.fromEntries(
     PRESSURE_OPTIONS.map((p) => [p, 0])
-  ) as Record<PressureOption, number>;
+  );
 
   for (const row of rows) {
     if (row.pressure && row.pressure in counts) {
-      counts[row.pressure as PressureOption] = row.total;
+      counts[row.pressure] = row.total;
     }
   }
 
@@ -127,12 +115,9 @@ export async function getDatasetSummary(): Promise<DatasetSummary> {
 
   // Find emerging gap (category with fewest responses, excluding "other")
   const nonOther = sorted.filter(([key]) => key !== "other");
+  const rarest = nonOther[nonOther.length - 1];
   const emergingGap =
-    nonOther.length > 0 && nonOther[nonOther.length - 1][1] === 0
-      ? nonOther[nonOther.length - 1][0]
-      : nonOther.length > 0 && totalCount >= 10
-        ? nonOther[nonOther.length - 1][0]
-        : null;
+    rarest && (rarest[1] === 0 || totalCount >= 10) ? rarest[0] : null;
 
   // Extract simple sacrifice themes from the texts
   const themes = extractSimpleThemes(sacrifices);

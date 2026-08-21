@@ -41,7 +41,6 @@ export const fixedQuestionSchema = z.discriminatedUnion("type", [
 export type FixedQuestion = z.infer<typeof fixedQuestionSchema>;
 export type ChoiceQuestion = z.infer<typeof choiceQuestionSchema>;
 export type ScaleQuestion = z.infer<typeof scaleQuestionSchema>;
-export type TextQuestion = z.infer<typeof textQuestionSchema>;
 
 // ─── Seed data entry ────────────────────────────────────────
 
@@ -55,7 +54,6 @@ const seedEntrySchema = z.object({
 export const surveyConfigSchema = z.object({
   branding: z.object({
     appName: z.string(),
-    tagline: z.string(),
     metaDescription: z.string(),
     ogDescription: z.string(),
   }),

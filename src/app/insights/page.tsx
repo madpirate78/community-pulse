@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { config } from "@/config";
 import { getLatestInsight } from "@/lib/db-queries";
+import { InsightDisplay } from "@/components/insights/InsightDisplay";
 
 export const metadata: Metadata = { title: "Insights" };
-import { InsightDisplay } from "@/components/insights/InsightDisplay";
 
 export const dynamic = "force-dynamic";
 

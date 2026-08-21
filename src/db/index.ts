@@ -42,16 +42,6 @@ function createDb() {
     );
   `);
 
-  // Migrate: add content_safe column.
-  // Backfill only runs when the column is first added — the only time NULL rows
-  // are genuinely legacy data without a moderation status.
-  try {
-    sqlite.exec(`ALTER TABLE submissions ADD COLUMN content_safe INTEGER`);
-    sqlite.exec(`UPDATE submissions SET content_safe = 1 WHERE content_safe IS NULL`);
-  } catch (e: unknown) {
-    if (!(e instanceof Error && e.message.includes("duplicate column"))) throw e;
-  }
-
   // Indexes for common query patterns
   sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_consent_safe ON submissions(consent_given, content_safe)`);
   sqlite.exec(`CREATE INDEX IF NOT EXISTS idx_submissions_created_at ON submissions(created_at)`);
