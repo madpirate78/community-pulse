@@ -76,7 +76,7 @@ ${stats.ai_themes
   )
   .join("\n")}
 
-Use the COMMUNITY THEMES section to structure your narrative around the dominant patterns, but let the individual quotes bring them to life.
+Use the COMMUNITY THEMES section to structure your narrative around the dominant patterns, but let the individual quotes bring them to life in their own words.
 `;
   }
 
