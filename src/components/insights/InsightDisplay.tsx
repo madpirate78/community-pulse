@@ -1,5 +1,6 @@
 import Markdown from "react-markdown";
 import { config } from "@/config";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 interface InsightDisplayProps {
   cachedInsight?: string | null;
@@ -8,12 +9,10 @@ interface InsightDisplayProps {
 export function InsightDisplay({ cachedInsight }: InsightDisplayProps) {
   if (!cachedInsight) {
     return (
-      <div className="rounded-xl border-2 border-dashed border-accent/30 p-8 text-center text-muted">
-        <p className="text-lg font-medium">{config.pages.insights.emptyHeading}</p>
-        <p className="mt-1 text-sm">
-          {config.pages.insights.emptyBody}
-        </p>
-      </div>
+      <EmptyState
+        heading={config.pages.insights.emptyHeading}
+        body={config.pages.insights.emptyBody}
+      />
     );
   }
 

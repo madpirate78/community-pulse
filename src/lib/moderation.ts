@@ -2,7 +2,7 @@ import { ThinkingLevel } from "@google/genai";
 import { eq } from "drizzle-orm";
 import { getAI, MODELS } from "@/lib/gemini";
 import { renderPrompt } from "@/lib/prompt-renderer";
-import { RETRY_DELAYS } from "@/lib/retry";
+import { RETRY_DELAYS, sleep } from "@/lib/retry";
 import { log } from "@/lib/logger";
 import { config } from "@/config";
 import { db } from "@/db";
@@ -105,7 +105,7 @@ export async function retryModeration(
   texts: string[]
 ): Promise<void> {
   for (let attempt = 0; attempt < RETRY_DELAYS.length; attempt++) {
-    await new Promise((resolve) => setTimeout(resolve, RETRY_DELAYS[attempt]));
+    await sleep(RETRY_DELAYS[attempt]);
 
     try {
       const result = await moderateContent(texts);

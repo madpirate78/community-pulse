@@ -1,6 +1,6 @@
 import { db } from "../src/db";
 import { submissions } from "../src/db/schema";
-import config from "../src/config/survey.config";
+import { config } from "../src/config";
 
 const SEED_DATA = config.seedData ?? [];
 

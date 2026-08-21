@@ -10,6 +10,8 @@ import { aiLimiter } from "@/lib/rate-limit";
 import { applyRateLimit } from "@/lib/api-utils";
 import { log } from "@/lib/logger";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   const blocked = applyRateLimit(req, aiLimiter);
   if (blocked) return blocked;

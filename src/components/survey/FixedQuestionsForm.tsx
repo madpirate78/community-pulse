@@ -5,6 +5,7 @@ import { questions } from "@/config/client";
 import type { FixedQuestion } from "@/config/schema";
 import { ChoiceSelector } from "./ChoiceSelector";
 import { ScaleSelector } from "./ScaleSelector";
+import { submitButtonClass, textInputClass } from "@/components/ui/form-styles";
 
 interface FixedQuestionsFormProps {
   onSubmit: (answers: Record<string, unknown>) => void;
@@ -88,7 +89,7 @@ export function FixedQuestionsForm({
         type="submit"
         disabled={isSubmitting}
         aria-busy={isSubmitting}
-        className="w-full rounded-xl bg-accent px-6 py-4 text-lg font-semibold text-white transition-all hover:bg-accent-hover hover:shadow-soft-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
+        className={submitButtonClass}
       >
         {isSubmitting ? "Submitting\u2026" : "Continue"}
       </button>
@@ -153,7 +154,7 @@ function QuestionField({
             maxLength={question.maxLength}
             rows={2}
             aria-describedby={error ? `${fieldId}-error` : undefined}
-            className="w-full rounded-lg border-2 border-border bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted transition-colors focus:border-accent focus:outline-none"
+            className={textInputClass}
           />
           <div className="mt-1 flex justify-between text-xs text-muted">
             {error ? (

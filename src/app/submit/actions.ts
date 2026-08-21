@@ -9,6 +9,7 @@ import { collectFreeText, moderateContent, retryModeration } from "@/lib/moderat
 import { maybeExtractThemes } from "@/lib/theme-extraction";
 import { maybeGenerateInsight } from "@/lib/insight-generation";
 import { submitLimiter } from "@/lib/rate-limit";
+import { getClientIp } from "@/lib/api-utils";
 import { getSubmissionCount } from "@/lib/db-queries";
 import { log } from "@/lib/logger";
 
@@ -17,12 +18,7 @@ export async function submitResponse(
   adaptiveData?: Record<string, unknown>[] | null
 ) {
   // ── Rate limit: per-IP throttle ──────────────────────────────
-  const hdrs = await headers();
-  const forwarded = hdrs.get("x-forwarded-for");
-  const ip = forwarded
-    ? forwarded.split(",")[0].trim()
-    : hdrs.get("x-real-ip") ?? "127.0.0.1";
-
+  const ip = getClientIp(await headers());
   const rateCheck = submitLimiter.check(ip);
   if (!rateCheck.allowed) {
     return {
@@ -65,8 +61,9 @@ export async function submitResponse(
   try {
     const moderation = await moderateContent(freeTexts);
     contentSafe = moderation.safe;
-  } catch {
+  } catch (error) {
     // Moderation API error — mark for background retry
+    log.warn("Moderation call failed, deferring to background retry:", error);
     contentSafe = freeTexts.length === 0 ? true : null;
   }
 
@@ -81,13 +78,14 @@ export async function submitResponse(
     .returning({ id: submissions.id });
 
   if (contentSafe === null) {
-    log.warn("Moderation API error — submission stored with contentSafe=null, retrying in background");
-    retryModeration(inserted.id, freeTexts).catch(console.error);
+    retryModeration(inserted.id, freeTexts).catch((error) =>
+      log.error("Background moderation retry crashed:", error)
+    );
   }
 
   maybeExtractThemes()
     .then(() => maybeGenerateInsight())
-    .catch(console.error);
+    .catch((error) => log.error("Post-submission AI pipeline failed:", error));
 
   return { success: true as const };
 }

@@ -10,6 +10,7 @@ import {
   getLatestInsight,
 } from "@/lib/db-queries";
 import { PRESSURE_LABELS } from "@/lib/types";
+import type { DatasetSummary } from "@/lib/types";
 import { config } from "@/config";
 import { db } from "@/db";
 import { insightSnapshots } from "@/db/schema";
@@ -34,9 +35,17 @@ export async function shouldGenerateInsight(): Promise<boolean> {
   );
 }
 
-export async function generateInsight(): Promise<string | null> {
-  const start = Date.now();
+export interface InsightContext {
+  summary: DatasetSummary;
+  systemPrompt: string;
+  userPrompt: string;
+}
 
+/**
+ * Gather all community data and build the insight prompts.
+ * Returns null when there are no submissions yet.
+ */
+export async function buildInsightContext(): Promise<InsightContext | null> {
   const [summary, sacrifices, adaptiveData, recent] =
     await Promise.all([
       getDatasetSummary(),
@@ -56,21 +65,46 @@ export async function generateInsight(): Promise<string | null> {
     )
     .join("\n");
 
-  const systemPrompt = buildInsightSystemPrompt();
-  const userPrompt = buildInsightUserPrompt(
+  return {
     summary,
-    pressuresRanked,
-    sacrifices,
-    adaptiveData,
-    recent.thisWeek,
-    recent.thisMonth
-  );
+    systemPrompt: buildInsightSystemPrompt(),
+    userPrompt: buildInsightUserPrompt(
+      summary,
+      pressuresRanked,
+      sacrifices,
+      adaptiveData,
+      recent.thisWeek,
+      recent.thisMonth
+    ),
+  };
+}
+
+/** Persist a generated insight alongside the data snapshot it came from. */
+export async function saveInsightSnapshot(
+  text: string,
+  summary: DatasetSummary,
+  startedAt: number
+): Promise<void> {
+  await db.insert(insightSnapshots).values({
+    insightText: text,
+    dataSummary: summary as unknown as Record<string, unknown>,
+    submissionCount: summary.total_responses,
+    modelUsed: MODELS.thinking,
+    generationTimeMs: Date.now() - startedAt,
+  });
+}
+
+export async function generateInsight(): Promise<string | null> {
+  const start = Date.now();
+
+  const context = await buildInsightContext();
+  if (!context) return null;
 
   const response = await getAI().models.generateContent({
     model: MODELS.thinking,
-    contents: userPrompt,
+    contents: context.userPrompt,
     config: {
-      systemInstruction: systemPrompt,
+      systemInstruction: context.systemPrompt,
       thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
     },
   });
@@ -80,14 +114,7 @@ export async function generateInsight(): Promise<string | null> {
     throw new Error("Empty response from insight generation model");
   }
 
-  await db.insert(insightSnapshots).values({
-    insightText: text,
-    dataSummary: summary as unknown as Record<string, unknown>,
-    submissionCount: summary.total_responses,
-    modelUsed: MODELS.thinking,
-    generationTimeMs: Date.now() - start,
-  });
-
+  await saveInsightSnapshot(text, context.summary, start);
   return text;
 }
 

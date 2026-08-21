@@ -5,12 +5,14 @@ import type { RateLimiter } from "./rate-limit";
  * Extract the client IP from request headers.
  * Checks x-forwarded-for (reverse proxy) then x-real-ip, falls back to
  * a constant so rate limiting still works in development.
+ * Accepts anything with a Headers-like get() so it works with both
+ * Request.headers and next/headers.
  */
-export function getClientIp(req: Request): string {
-  const forwarded = req.headers.get("x-forwarded-for");
+export function getClientIp(headers: Pick<Headers, "get">): string {
+  const forwarded = headers.get("x-forwarded-for");
   if (forwarded) return forwarded.split(",")[0].trim();
 
-  const realIp = req.headers.get("x-real-ip");
+  const realIp = headers.get("x-real-ip");
   if (realIp) return realIp;
 
   return "127.0.0.1";
@@ -24,7 +26,7 @@ export function applyRateLimit(
   req: Request,
   limiter: RateLimiter
 ): NextResponse | null {
-  const ip = getClientIp(req);
+  const ip = getClientIp(req.headers);
   const result = limiter.check(ip);
 
   if (!result.allowed) {

@@ -10,13 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-
-interface PressureData {
-  key: string;
-  label: string;
-  count: number;
-  pct: number;
-}
+import type { PressureStat } from "@/lib/types";
 
 // Fixed palette for the default survey categories; unknown keys
 // (from a customised config) cycle through the fallback palette.
@@ -52,7 +46,7 @@ function useIsMobile() {
   return mobile;
 }
 
-export function PressureChart({ data }: { data: PressureData[] }) {
+export function PressureChart({ data }: { data: PressureStat[] }) {
   const isMobile = useIsMobile();
 
   if (data.length === 0) return null;

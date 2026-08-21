@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000). The SQLite database and its
 | `bun run lint` | ESLint via `next lint` |
 | `bun run typecheck` | TypeScript check (`tsc --noEmit`) |
 | `bun test` | Run the test suite |
-| `bun run seed` | Seed the database with the sample data from the config |
+| `bun run seed` | Seed the database with the sample data from the config (runs via `tsx` — `better-sqlite3` is a Node native module Bun can’t load) |
 
 All checks run in CI on every push.
 

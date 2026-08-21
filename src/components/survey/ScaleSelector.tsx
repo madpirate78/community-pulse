@@ -20,6 +20,7 @@ export function ScaleSelector({ min, max, labels, value, onChange }: ScaleSelect
             key={n}
             type="button"
             onClick={() => onChange(n)}
+            aria-pressed={value === n}
             className={`flex-1 rounded-lg border-2 px-2 py-3 text-center text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
               value === n
                 ? "border-accent bg-accent-subtle text-foreground shadow-soft"

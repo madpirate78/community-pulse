@@ -96,6 +96,25 @@ export const extractedThemesResponseSchema = z.object({
 
 export type ExtractedTheme = z.infer<typeof extractedThemeSchema>;
 
+// ─── Statistics API response ─────────────────────────────────
+
+export interface PressureStat {
+  key: string;
+  label: string;
+  count: number;
+  pct: number;
+}
+
+/** Shape returned by GET /api/statistics and consumed by the dashboard. */
+export interface StatisticsResponse {
+  total: number;
+  avgChange: number;
+  topPressure: string;
+  topPressurePct: number;
+  pressures: PressureStat[];
+  sacrificeThemes: string[];
+}
+
 // ─── Dataset Summary (fed into AI prompts) ────────────────────
 
 export interface DatasetSummary {
