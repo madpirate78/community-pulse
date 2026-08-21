@@ -176,7 +176,7 @@ Generate 1-2 follow-up questions that:
 
 {{volume_guidance}}
 
-Return exactly 1-2 questions as structured JSON.`,
+Return 1-2 questions as structured JSON. single_choice questions MUST include 3-5 options; scale questions MUST include scale_min_label and scale_max_label.`,
 
     insightSystem: `You are a community research analyst synthesising anonymous feedback data
 into a narrative insight report. You write as the voice of the community —
@@ -242,6 +242,7 @@ For each theme:
 Rules:
 - Return between 1 and 12 themes, ranked by frequency (most common first)
 - Only create a theme if at least 2 responses relate to it
+- If no theme reaches 2 related responses, return the single theme that best captures the most common pattern instead
 - Use the respondents' own language where possible
 - Do not invent or embellish quotes — use exact text from the responses above
 
@@ -262,7 +263,7 @@ Review the following {{count}} free-text response(s) for content that should NOT
 {{texts}}
 
 Flag as UNSAFE only if a response contains:
-- Personal identifying information about OTHER people (names + addresses, phone numbers, etc.)
+- Personal identifying information — the respondent’s own or anyone else’s (names with addresses, phone numbers, emails, etc.)
 - Hate speech, slurs, or threats of violence
 - Spam, advertising, or completely unrelated content (e.g. random strings, product promotions)
 
