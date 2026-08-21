@@ -2,6 +2,12 @@
 
 Anonymous community feedback powered by AI-generated insights.
 
+## Project status
+
+This repo is the original hackathon build (working name *Dyadem*), written up [on dev.to](https://dev.to/adamp78/i-built-surveys-that-get-smarter-with-every-response-1l1).
+The production system at [communitypulse.org.uk](https://communitypulse.org.uk) grew out of it and is closed-source as a commercial product. Findings from its 51-respondent field deployment are written up [here](https://adampio.dev/blog/when-community-feedback-contradicts-itself).
+
+
 Community Pulse collects anonymous survey responses, uses Gemini to generate personalised follow-up questions, and synthesises all responses into a narrative "Community Voice" insight. The entire survey — questions, branding, AI prompts, and page copy — is driven by a single config file, making it reusable for any community feedback scenario.
 
 ## Features
