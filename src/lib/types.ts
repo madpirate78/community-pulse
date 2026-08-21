@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { config } from "@/config";
+import { renderPrompt } from "./prompt-renderer";
 import type { ChoiceQuestion } from "@/config/schema";
 
 // ─── Dynamic fixed-questions schema from config ─────────────
@@ -20,8 +21,11 @@ function buildFixedSchema() {
       case "text":
         shape[q.fieldName] = z
           .string()
-          .min(q.minLength, "Please share at least a brief answer")
-          .max(q.maxLength, `Please keep this brief — under ${q.maxLength} characters`);
+          .min(q.minLength, config.ui.validation.textTooShort)
+          .max(
+            q.maxLength,
+            renderPrompt(config.ui.validation.textTooLong, { max: q.maxLength })
+          );
         break;
     }
   }
@@ -70,6 +74,12 @@ export type AdaptiveQuestions = z.infer<typeof adaptiveQuestionSchema>;
 
 // ─── Adaptive Responses (submitted answers to follow-ups) ────
 
+/** UI and prompt limit for adaptive short-text answers. */
+export const ADAPTIVE_ANSWER_MAX_LENGTH =
+  config.operational.adaptiveAnswerMaxLength;
+
+// The length caps below are server-side sanity bounds — deliberately
+// looser than the UI limit so choice-option answers aren't rejected.
 export const adaptiveResponseSchema = z
   .array(
     z.object({

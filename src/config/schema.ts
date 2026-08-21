@@ -51,6 +51,11 @@ const seedEntrySchema = z.object({
 
 // ─── Top-level config schema ────────────────────────────────
 
+const rateLimitSchema = z.object({
+  maxRequests: z.number().int().min(1),
+  windowMs: z.number().int().min(1),
+});
+
 export const surveyConfigSchema = z.object({
   branding: z.object({
     appName: z.string(),
@@ -81,6 +86,8 @@ export const surveyConfigSchema = z.object({
       themesHeading: z.string(),
       emptyHeading: z.string(),
       emptyBody: z.string(),
+      errorHeading: z.string(),
+      errorBody: z.string(),
     }),
     insights: z.object({
       heading: z.string(),
@@ -89,6 +96,55 @@ export const surveyConfigSchema = z.object({
       previewLink: z.string(),
       emptyHeading: z.string(),
       emptyBody: z.string(),
+      generatedFrom: z.string(),
+      generationTime: z.string(),
+    }),
+    error: z.object({
+      heading: z.string(),
+      retryLabel: z.string(),
+    }),
+    notFound: z.object({
+      heading: z.string(),
+      body: z.string(),
+      ctaHome: z.string(),
+    }),
+  }),
+
+  ui: z.object({
+    nav: z.object({
+      submit: z.string(),
+      statistics: z.string(),
+      insights: z.string(),
+    }),
+    skipLink: z.string(),
+    survey: z.object({
+      adaptiveIntro: z.string(),
+      adaptiveTextPlaceholder: z.string(),
+      continueLabel: z.string(),
+      submitLabel: z.string(),
+      submittingLabel: z.string(),
+      submittingMessage: z.string(),
+      loaderMessages: z.array(z.string()).min(1),
+    }),
+    validation: z.object({
+      choiceRequired: z.string(),
+      scaleRequired: z.string(),
+      textTooShort: z.string(),
+      textTooLong: z.string(),
+    }),
+    errors: z.object({
+      busy: z.string(),
+      generic: z.string(),
+      rateLimited: z.string(),
+      submissionsClosed: z.string(),
+    }),
+    stats: z.object({
+      voiceSingular: z.string(),
+      voicePlural: z.string(),
+      topConcernLabel: z.string(),
+      avgChangeLabel: z.string(),
+      chartCountLabel: z.string(),
+      chartUnit: z.string(),
     }),
   }),
 
@@ -102,6 +158,11 @@ export const surveyConfigSchema = z.object({
     insightUser: z.string(),
     themeExtraction: z.string(),
     moderation: z.string(),
+    volumeGuidance: z.object({
+      sparse: z.string(),
+      building: z.string(),
+      substantial: z.string(),
+    }),
   }),
 
   fallbackThemeKeywords: z.record(z.string(), z.array(z.string())),
@@ -113,6 +174,17 @@ export const surveyConfigSchema = z.object({
     statisticsCacheTtlMs: z.number().int().min(0),
     minSubmissionsForAI: z.number().int().min(1),
     maxSubmissions: z.number().int().min(1).optional(),
+    adaptiveAnswerMaxLength: z.number().int().min(1),
+    fallbackThemeCount: z.number().int().min(1),
+    volumeThresholds: z.object({
+      sparse: z.number().int().min(1),
+      substantial: z.number().int().min(1),
+    }),
+    rateLimits: z.object({
+      ai: rateLimitSchema,
+      read: rateLimitSchema,
+      submit: rateLimitSchema,
+    }),
   }),
 
   seedData: z.array(seedEntrySchema).optional(),

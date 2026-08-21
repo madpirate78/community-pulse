@@ -1,3 +1,5 @@
+import "server-only";
+
 import { config } from "@/config";
 import { renderPrompt } from "./prompt-renderer";
 import type { FixedAnswers, DatasetSummary } from "./types";
@@ -16,22 +18,26 @@ export function buildAdaptiveQuestionPrompt(
     ? `- DATA GAP: We have very few responses about ${datasetSummary.emerging_gap}`
     : "";
 
-  let volumeGuidance: string;
-  if (datasetSummary.total_responses < 10) {
-    volumeGuidance =
-      "We have very few responses. Ask broader questions to establish baseline understanding.";
-  } else if (datasetSummary.total_responses < 50) {
-    volumeGuidance =
-      "We're building a picture. Start probing for nuance within the dominant themes.";
-  } else {
-    volumeGuidance =
-      "We have substantial data. Ask targeted questions to uncover the most surprising or underreported patterns.";
-  }
+  const { sparse, substantial } = config.operational.volumeThresholds;
+  const volumeGuidance =
+    datasetSummary.total_responses < sparse
+      ? config.prompts.volumeGuidance.sparse
+      : datasetSummary.total_responses < substantial
+        ? config.prompts.volumeGuidance.building
+        : config.prompts.volumeGuidance.substantial;
+
+  // Expose every fixed answer under its config-defined field name, so
+  // prompt templates can reference whatever {{fields}} the config declares.
+  const answerVars = Object.fromEntries(
+    Object.entries(userAnswers as Record<string, unknown>).map(([key, value]) => [
+      key,
+      String(value ?? ""),
+    ])
+  );
 
   return renderPrompt(config.prompts.adaptiveQuestions, {
-    biggest_pressure: String((userAnswers as Record<string, unknown>).biggest_pressure ?? ""),
-    change_direction: String((userAnswers as Record<string, unknown>).change_direction ?? ""),
-    sacrifice: String((userAnswers as Record<string, unknown>).sacrifice ?? ""),
+    ...answerVars,
+    adaptive_answer_max_length: config.operational.adaptiveAnswerMaxLength,
     total_responses: datasetSummary.total_responses,
     top_pressure: datasetSummary.top_pressure,
     top_pressure_pct: datasetSummary.top_pressure_pct,

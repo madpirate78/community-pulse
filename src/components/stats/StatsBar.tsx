@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PRESSURE_LABELS } from "@/lib/types";
+import { ui } from "@/config/client";
 import { motion, useSpring, useMotionValueEvent } from "framer-motion";
 
 interface StatsBarProps {
@@ -40,16 +41,17 @@ export function StatsBar({
       transition={{ duration: 0.4, delay: 0.3 }}
     >
       <span className="font-semibold text-accent">
-        <AnimatedNumber value={total} /> {total === 1 ? "voice" : "voices"}
+        <AnimatedNumber value={total} />{" "}
+        {total === 1 ? ui.stats.voiceSingular : ui.stats.voicePlural}
       </span>
       <span className="text-muted" aria-hidden="true">&middot;</span>
       <span className="text-muted">
-        Top concern: {PRESSURE_LABELS[topPressure] ?? topPressure} (
+        {ui.stats.topConcernLabel} {PRESSURE_LABELS[topPressure] ?? topPressure} (
         <AnimatedNumber value={topPressurePct} />%)
       </span>
       <span className="text-muted" aria-hidden="true">&middot;</span>
       <span className="text-muted">
-        Avg change: <span className="font-mono text-foreground"><AnimatedNumber value={avgChange} decimals={1} />/5</span>
+        {ui.stats.avgChangeLabel} <span className="font-mono text-foreground"><AnimatedNumber value={avgChange} decimals={1} />/5</span>
       </span>
     </motion.div>
   );

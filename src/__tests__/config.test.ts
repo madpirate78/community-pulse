@@ -28,9 +28,13 @@ describe("survey config", () => {
   });
 
   test("all prompt templates are non-empty strings", () => {
-    for (const [, prompt] of Object.entries(config.prompts)) {
-      expect(typeof prompt).toBe("string");
-      expect(prompt.length).toBeGreaterThan(0);
+    for (const prompt of Object.values(config.prompts)) {
+      const leaves =
+        typeof prompt === "string" ? [prompt] : Object.values(prompt);
+      for (const leaf of leaves) {
+        expect(typeof leaf).toBe("string");
+        expect(leaf.length).toBeGreaterThan(0);
+      }
     }
   });
 

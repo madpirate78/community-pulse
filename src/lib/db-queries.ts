@@ -151,7 +151,7 @@ function extractSimpleThemes(sacrifices: string[]): string[] {
   return Object.entries(counts)
     .filter(([, c]) => c > 0)
     .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
+    .slice(0, config.operational.fallbackThemeCount)
     .map(([theme]) => theme);
 }
 

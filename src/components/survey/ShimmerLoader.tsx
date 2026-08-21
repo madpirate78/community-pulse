@@ -2,12 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ui } from "@/config/client";
 
-const messages = [
-  "Thinking about what to ask you next...",
-  "Reading what you shared...",
-  "Tailoring follow-up questions...",
-];
+const messages = ui.survey.loaderMessages;
 
 export function ShimmerLoader() {
   const [index, setIndex] = useState(0);

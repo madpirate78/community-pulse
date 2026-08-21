@@ -11,6 +11,7 @@ import {
   Cell,
 } from "recharts";
 import type { PressureStat } from "@/lib/types";
+import { ui } from "@/config/client";
 
 // Fixed palette for the default survey categories; unknown keys
 // (from a customised config) cycle through the fallback palette.
@@ -67,7 +68,7 @@ export function PressureChart({ data }: { data: PressureStat[] }) {
             tick={{ fontSize: isMobile ? 11 : 13, fill: "var(--text-muted)" }}
           />
           <Tooltip
-            formatter={(value) => [`${value} responses`, "Count"]}
+            formatter={(value) => [`${value} ${ui.stats.chartUnit}`, ui.stats.chartCountLabel]}
             contentStyle={{
               background: "var(--bg-surface)",
               border: "1px solid var(--border)",

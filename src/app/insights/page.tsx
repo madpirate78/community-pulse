@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { config } from "@/config";
 import { getLatestInsight } from "@/lib/db-queries";
 import { InsightDisplay } from "@/components/insights/InsightDisplay";
+import { renderPrompt } from "@/lib/prompt-renderer";
 
 export const metadata: Metadata = { title: "Insights" };
 
@@ -24,9 +25,13 @@ export default async function InsightsPage() {
         <InsightDisplay cachedInsight={latest?.insightText ?? null} />
         {latest && (
           <p className="mt-3 text-xs text-muted">
-            Last generated from {latest.submissionCount} responses
+            {renderPrompt(config.pages.insights.generatedFrom, {
+              count: latest.submissionCount,
+            })}
             {latest.generationTimeMs
-              ? ` in ${(latest.generationTimeMs / 1000).toFixed(1)}s`
+              ? renderPrompt(config.pages.insights.generationTime, {
+                  seconds: (latest.generationTimeMs / 1000).toFixed(1),
+                })
               : ""}
           </p>
         )}

@@ -8,6 +8,7 @@ import { FixedQuestionsForm } from "./FixedQuestionsForm";
 import { ShimmerLoader } from "./ShimmerLoader";
 import { AdaptiveForm } from "./AdaptiveForm";
 import { submitResponse } from "@/app/submit/actions";
+import { ui } from "@/config/client";
 
 type Stage = "fixed" | "loading" | "adaptive" | "done";
 
@@ -48,12 +49,12 @@ export function SurveyFlow() {
       }
 
       if (!res.ok) {
-        setBusyMessage("The server is busy right now. Please try again in a moment.");
+        setBusyMessage(ui.errors.busy);
         setStage("fixed");
         return;
       }
     } catch {
-      setBusyMessage("The server is busy right now. Please try again in a moment.");
+      setBusyMessage(ui.errors.busy);
       setStage("fixed");
       return;
     }
@@ -90,7 +91,7 @@ export function SurveyFlow() {
       // Network or unexpected error
     }
 
-    setBusyMessage("Something went wrong. Please try again.");
+    setBusyMessage(ui.errors.generic);
     setStage("fixed");
   }
 

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { questions } from "@/config/client";
+import { questions, ui } from "@/config/client";
+import { renderPrompt } from "@/lib/prompt-renderer";
 import type { FixedQuestion } from "@/config/schema";
 import { ChoiceSelector } from "./ChoiceSelector";
 import { ScaleSelector } from "./ScaleSelector";
@@ -38,17 +39,19 @@ export function FixedQuestionsForm({
       const val = values[q.fieldName];
       switch (q.type) {
         case "choice":
-          if (!val) newErrors[q.fieldName] = "Please select an option";
+          if (!val) newErrors[q.fieldName] = ui.validation.choiceRequired;
           break;
         case "scale":
-          if (val == null) newErrors[q.fieldName] = "Please select a value";
+          if (val == null) newErrors[q.fieldName] = ui.validation.scaleRequired;
           break;
         case "text": {
           const str = (typeof val === "string" ? val : "").trim();
           if (str.length < q.minLength)
-            newErrors[q.fieldName] = "Please share at least a brief answer";
+            newErrors[q.fieldName] = ui.validation.textTooShort;
           if (str.length > q.maxLength)
-            newErrors[q.fieldName] = `Please keep this under ${q.maxLength} characters`;
+            newErrors[q.fieldName] = renderPrompt(ui.validation.textTooLong, {
+              max: q.maxLength,
+            });
           break;
         }
       }

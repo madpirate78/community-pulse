@@ -52,7 +52,7 @@ export default function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white"
         >
-          Skip to main content
+          {config.ui.skipLink}
         </a>
         <nav className="sticky top-0 z-40 bg-canvas/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
@@ -64,19 +64,19 @@ export default function RootLayout({
                 href="/submit"
                 className="relative text-muted transition-colors hover:text-foreground"
               >
-                Submit
+                {config.ui.nav.submit}
               </Link>
               <Link
                 href="/statistics"
                 className="relative text-muted transition-colors hover:text-foreground"
               >
-                Statistics
+                {config.ui.nav.statistics}
               </Link>
               <Link
                 href="/insights"
                 className="relative text-muted transition-colors hover:text-foreground"
               >
-                Insights
+                {config.ui.nav.insights}
               </Link>
             </div>
           </div>

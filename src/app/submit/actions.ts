@@ -24,7 +24,7 @@ export async function submitResponse(
     return {
       success: false as const,
       error: "rate_limited" as const,
-      message: "You're submitting too quickly. Please wait a few minutes and try again.",
+      message: config.ui.errors.rateLimited,
     };
   }
 
@@ -35,7 +35,7 @@ export async function submitResponse(
       return {
         success: false as const,
         error: "submissions_closed" as const,
-        message: "This survey has reached its response limit. Thank you for your interest.",
+        message: config.ui.errors.submissionsClosed,
       };
     }
   }

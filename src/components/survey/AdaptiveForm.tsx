@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { ADAPTIVE_ANSWER_MAX_LENGTH } from "@/lib/types";
 import type { AdaptiveQuestions } from "@/lib/types";
+import { ui } from "@/config/client";
 import { ChoiceSelector } from "./ChoiceSelector";
 import { ScaleSelector } from "./ScaleSelector";
 import { submitButtonClass, textInputClass } from "@/components/ui/form-styles";
@@ -32,9 +34,7 @@ export function AdaptiveForm({ questions, onSubmit }: AdaptiveFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <p className="text-sm text-muted">
-        Based on what you shared, we have a couple more questions:
-      </p>
+      <p className="text-sm text-muted">{ui.survey.adaptiveIntro}</p>
 
       {questions.questions.map((q, i) => {
         const fieldId = `adaptive-${i}`;
@@ -78,11 +78,11 @@ export function AdaptiveForm({ questions, onSubmit }: AdaptiveFormProps) {
               <input
                 id={fieldId}
                 type="text"
-                maxLength={100}
+                maxLength={ADAPTIVE_ANSWER_MAX_LENGTH}
                 value={(answers[i] as string) ?? ""}
                 onChange={(e) => setAnswer(i, e.target.value)}
                 className={textInputClass}
-                placeholder="Your answer..."
+                placeholder={ui.survey.adaptiveTextPlaceholder}
               />
             )}
           </div>
@@ -95,7 +95,7 @@ export function AdaptiveForm({ questions, onSubmit }: AdaptiveFormProps) {
         aria-busy={isSubmitting}
         className={submitButtonClass}
       >
-        {isSubmitting ? "Submitting\u2026" : "Submit Your Voice"}
+        {isSubmitting ? ui.survey.submittingLabel : ui.survey.submitLabel}
       </button>
     </form>
   );

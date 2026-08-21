@@ -5,6 +5,8 @@
  * Old entries are pruned on every check to prevent memory leaks.
  */
 
+import { config } from "@/config";
+
 interface RateLimitEntry {
   timestamps: number[];
 }
@@ -54,22 +56,15 @@ export class RateLimiter {
   }
 }
 
-// ─── Pre-configured limiters ────────────────────────────────────
+// ─── Pre-configured limiters (tuned in config.operational.rateLimits) ───
 
-/** AI endpoints: 5 requests per 60 seconds per IP */
-export const aiLimiter = new RateLimiter({
-  maxRequests: 5,
-  windowMs: 60_000,
-});
+/** AI endpoints. */
+export const aiLimiter = new RateLimiter(config.operational.rateLimits.ai);
 
-/** General read endpoints: 30 requests per 60 seconds per IP */
-export const readLimiter = new RateLimiter({
-  maxRequests: 30,
-  windowMs: 60_000,
-});
+/** General read endpoints. */
+export const readLimiter = new RateLimiter(config.operational.rateLimits.read);
 
-/** Form submissions: 3 per 5 minutes per IP */
-export const submitLimiter = new RateLimiter({
-  maxRequests: 3,
-  windowMs: 5 * 60_000,
-});
+/** Form submissions. */
+export const submitLimiter = new RateLimiter(
+  config.operational.rateLimits.submit
+);

@@ -16,7 +16,7 @@ const config: SurveyConfig = {
       headline: "The cost of living is changing how we live.",
       subtext:
         "Share your experience anonymously. Our AI turns individual voices into a collective picture of what communities are really going through.",
-      ctaText: "Add Your Voice \u2014 90 seconds, anonymous",
+      ctaText: "Add Your Voice — 90 seconds, anonymous",
     },
     submit: {
       heading: "Add Your Voice",
@@ -26,7 +26,7 @@ const config: SurveyConfig = {
     thankYou: {
       heading: "Your voice has been added",
       body: "Thank you for sharing. Every response helps build a clearer picture of what our community is going through.",
-      ctaInsights: "See What We\u2019re All Saying",
+      ctaInsights: "See What We’re All Saying",
       ctaStats: "View Statistics",
     },
     statistics: {
@@ -36,6 +36,8 @@ const config: SurveyConfig = {
       themesHeading: "What People Are Giving Up",
       emptyHeading: "No submissions yet",
       emptyBody: "Be the first to add your voice.",
+      errorHeading: "Couldn’t load statistics",
+      errorBody: "Something went wrong fetching the data. Please try again shortly.",
     },
     insights: {
       heading: "Community Voice",
@@ -46,6 +48,62 @@ const config: SurveyConfig = {
       emptyHeading: "No community voice yet",
       emptyBody:
         "Insights are generated automatically as responses come in.",
+      generatedFrom: "Last generated from {{count}} responses",
+      generationTime: " in {{seconds}}s",
+    },
+    error: {
+      heading: "Something went wrong",
+      retryLabel: "Try again",
+    },
+    notFound: {
+      heading: "Page not found",
+      body: "The page you’re looking for doesn’t exist or has been moved.",
+      ctaHome: "Back to Home",
+    },
+  },
+
+  // ─── Interface copy ─────────────────────────────────────────
+  ui: {
+    nav: {
+      submit: "Submit",
+      statistics: "Statistics",
+      insights: "Insights",
+    },
+    skipLink: "Skip to main content",
+    survey: {
+      adaptiveIntro: "Based on what you shared, we have a couple more questions:",
+      adaptiveTextPlaceholder: "Your answer...",
+      continueLabel: "Continue",
+      submitLabel: "Submit Your Voice",
+      submittingLabel: "Submitting…",
+      submittingMessage: "Adding your voice…",
+      loaderMessages: [
+        "Thinking about what to ask you next...",
+        "Reading what you shared...",
+        "Tailoring follow-up questions...",
+      ],
+    },
+    validation: {
+      choiceRequired: "Please select an option",
+      scaleRequired: "Please select a value",
+      textTooShort: "Please share at least a brief answer",
+      textTooLong: "Please keep this brief — under {{max}} characters",
+    },
+    errors: {
+      busy: "The server is busy right now. Please try again in a moment.",
+      generic: "Something went wrong. Please try again.",
+      rateLimited:
+        "You’re submitting too quickly. Please wait a few minutes and try again.",
+      submissionsClosed:
+        "This survey has reached its response limit. Thank you for your interest.",
+    },
+    stats: {
+      voiceSingular: "voice",
+      voicePlural: "voices",
+      topConcernLabel: "Top concern:",
+      avgChangeLabel: "Avg change:",
+      chartCountLabel: "Count",
+      chartUnit: "responses",
     },
   },
 
@@ -55,7 +113,7 @@ const config: SurveyConfig = {
       {
         type: "choice",
         fieldName: "biggest_pressure",
-        label: "What\u2019s your biggest financial pressure right now?",
+        label: "What’s your biggest financial pressure right now?",
         options: [
           { value: "housing", label: "Housing costs" },
           { value: "food", label: "Food & groceries" },
@@ -84,7 +142,7 @@ const config: SurveyConfig = {
       {
         type: "text",
         fieldName: "sacrifice",
-        label: "What\u2019s the one thing you\u2019ve had to cut back on or give up?",
+        label: "What’s the one thing you’ve had to cut back on or give up?",
         placeholder: 'e.g. "Heating", "Seeing friends", "Fresh fruit"',
         minLength: 2,
         maxLength: 200,
@@ -112,7 +170,7 @@ Current dataset overview ({{total_responses}} responses so far):
 Generate 1-2 follow-up questions that:
 1. DIG DEEPER into this person's specific situation (based on their pressure + sacrifice)
 2. FILL GAPS in the dataset — ask about something the community hasn't told us much about yet
-3. Are QUICK to answer (single choice with 3-5 options, a 1-5 scale, or a short text under 100 chars)
+3. Are QUICK to answer (single choice with 3-5 options, a 1-5 scale, or a short text under {{adaptive_answer_max_length}} chars)
 4. Feel CONVERSATIONAL and empathetic, not clinical
 5. NEVER ask for identifying information (no name, postcode, employer, income figures)
 
@@ -189,6 +247,15 @@ Rules:
 
 Return valid JSON matching the schema.`,
 
+    volumeGuidance: {
+      sparse:
+        "We have very few responses. Ask broader questions to establish baseline understanding.",
+      building:
+        "We're building a picture. Start probing for nuance within the dominant themes.",
+      substantial:
+        "We have substantial data. Ask targeted questions to uncover the most surprising or underreported patterns.",
+    },
+
     moderation: `You are a content moderator for an anonymous community survey about cost-of-living pressures.
 
 Review the following {{count}} free-text response(s) for content that should NOT be stored:
@@ -228,6 +295,15 @@ Return JSON matching the schema.`,
     statisticsCacheTtlMs: 60_000, // 60 seconds
     minSubmissionsForAI: 5,
     maxSubmissions: 500,
+    adaptiveAnswerMaxLength: 100,
+    fallbackThemeCount: 5,
+    // Dataset sizes at which the adaptive-question prompt shifts tone
+    volumeThresholds: { sparse: 10, substantial: 50 },
+    rateLimits: {
+      ai: { maxRequests: 5, windowMs: 60_000 },
+      read: { maxRequests: 30, windowMs: 60_000 },
+      submit: { maxRequests: 3, windowMs: 300_000 }, // 3 per 5 minutes
+    },
   },
 
   // ─── Seed data (development) ────────────────────────────────

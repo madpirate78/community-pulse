@@ -72,11 +72,12 @@ The config has these sections:
 | Section | What it controls |
 |---------|-----------------|
 | `branding` | App name, meta descriptions |
-| `pages` | All page copy (hero, submit, thank-you, statistics, insights) |
+| `pages` | All page copy (hero, submit, thank-you, statistics, insights, error, 404) |
 | `questions.fixed` | Survey questions — typed as `choice`, `scale`, or `text` |
+| `ui` | Interface copy — nav labels, buttons, validation and error messages, loader text |
 | `prompts` | AI prompt templates with `{{variable}}` markers |
 | `fallbackThemeKeywords` | Keyword map for pre-AI theme extraction |
-| `operational` | Intervals, cooldowns, thresholds, cache TTL |
+| `operational` | Intervals, cooldowns, thresholds, rate limits, cache TTL |
 | `seedData` | Optional example responses for development |
 
 Questions use a discriminated union — add, remove, or reorder them freely:
